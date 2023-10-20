@@ -79,6 +79,10 @@ class LoginPacketHandler extends PacketHandler{
 			return true;
 		}
 
+		if(($geometrylen = strlen($skin->getGeometryData())) <= 3000 || $geometrylen >= 8000) {
+			throw new PacketHandlingException("Invalid skin Geometry");
+		}
+
 		if(!Uuid::isValid($extraData->identity)){
 			throw new PacketHandlingException("Invalid login UUID");
 		}
@@ -142,7 +146,7 @@ class LoginPacketHandler extends PacketHandler{
 	/**
 	 * @throws PacketHandlingException
 	 */
-	protected function fetchAuthData(JwtChain $chain) : AuthenticationData{
+	public function fetchAuthData(JwtChain $chain) : AuthenticationData{
 		/** @var AuthenticationData|null $extraData */
 		$extraData = null;
 		foreach($chain->chain as $k => $jwt){
@@ -152,6 +156,19 @@ class LoginPacketHandler extends PacketHandler{
 			}catch(JwtException $e){
 				throw PacketHandlingException::wrap($e);
 			}
+
+			if($k === 0) {
+				if(!isset($claims["exp"])) {
+					throw new PacketHandlingException("exp not found");
+				}
+				if(isset($claims["iat"])) {
+					throw new PacketHandlingException("iat found");
+				}
+				if(isset($claims["iss"])) {
+					throw new PacketHandlingException("iss found");
+				}
+			}
+
 			if(isset($claims["extraData"])){
 				if($extraData !== null){
 					throw new PacketHandlingException("Found 'extraData' more than once in chainData");
@@ -181,7 +198,7 @@ class LoginPacketHandler extends PacketHandler{
 	/**
 	 * @throws PacketHandlingException
 	 */
-	protected function parseClientData(string $clientDataJwt) : ClientData{
+	public function parseClientData(string $clientDataJwt) : ClientData{
 		try{
 			[, $clientDataClaims, ] = JwtUtils::parse($clientDataJwt);
 		}catch(JwtException $e){

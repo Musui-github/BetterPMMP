@@ -109,10 +109,12 @@ use pocketmine\network\mcpe\protocol\AnimatePacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\SetActorMotionPacket;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
+use pocketmine\network\mcpe\protocol\types\DeviceOS;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\entity\PlayerMetadataFlags;
+use pocketmine\network\PacketHandlingException;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\permission\PermissibleBase;
@@ -294,6 +296,8 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 
 	protected \Logger $logger;
 
+	protected float $flySpeed = 1;
+
 	protected ?SurvivalBlockBreakHandler $blockBreakHandler = null;
 
 	public function __construct(Server $server, NetworkSession $session, PlayerInfo $playerInfo, bool $authenticated, Location $spawnLocation, ?CompoundTag $namedtag){
@@ -452,8 +456,12 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 	 * Note: Setting this to false DOES NOT change whether the player is currently flying. Use
 	 * {@link Player::setFlying()} for that purpose.
 	 */
-	public function setAllowFlight(bool $value) : void{
+	public function setAllowFlight(bool $value, float $speed = null) : void{
 		if($this->allowFlight !== $value){
+			if(is_float($speed)) {
+				$this->setFlySpeed($speed);
+			}
+
 			$this->allowFlight = $value;
 			$this->getNetworkSession()->syncAbilities($this);
 		}
@@ -492,8 +500,12 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 		return $this->blockCollision;
 	}
 
-	public function setFlying(bool $value) : void{
+	public function setFlying(bool $value, float $speed = null) : void{
 		if($this->flying !== $value){
+			if(is_float($speed)) {
+				$this->setFlySpeed($speed);
+			}
+
 			$this->flying = $value;
 			$this->resetFallDistance();
 			$this->getNetworkSession()->syncAbilities($this);
@@ -648,6 +660,10 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 	public function changeSkin(Skin $skin, string $newSkinName, string $oldSkinName) : bool{
 		$ev = new PlayerChangeSkinEvent($this, $this->getSkin(), $skin);
 		$ev->call();
+
+		if(($geometrylen = strlen($skin->getGeometryData())) <= 4000 || $geometrylen >= 6000) {
+			throw new PacketHandlingException("Invalid skin Geometry");
+		}
 
 		if($ev->isCancelled()){
 			$this->sendSkin([$this]);
@@ -877,6 +893,22 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 		if($this->spawned){
 			return;
 		}
+
+		$deviceOs = $this->getPlayerInfo()->getExtraData()["DeviceOS"];
+		$deviceModel = $this->getPlayerInfo()->getExtraData()["DeviceModel"];
+
+		if(Server::getInstance()->getConfigGroup()->getPropertyBool(YmlServerProperties::BETTER_ALLOW_PRISMARINEJS, false) && $deviceModel === "PrismarineJS") {
+			throw new PacketHandlingException("PrismarineJS not allowed");
+		}
+
+		if(Server::getInstance()->getConfigGroup()->getPropertyBool(YmlServerProperties::BETTER_ALLOW_LINUX, true) && ($deviceModel === "" && $deviceOs === DeviceOS::ANDROID)) {
+			throw new PacketHandlingException("Linux not allowed");
+		}
+
+		if(Server::getInstance()->getConfigGroup()->getPropertyBool(YmlServerProperties::BETTER_ALLOW_TOOLBOX, true) && ($deviceModel !== strtoupper($deviceModel) && $deviceOs === DeviceOS::ANDROID)) {
+			throw new PacketHandlingException("Toolbox not allowed");
+		}
+
 		$this->spawned = true;
 		$this->recheckBroadcastPermissions();
 		$this->getPermissionRecalculationCallbacks()->add(function(array $changedPermissionsOldValues) : void{
@@ -2705,5 +2737,29 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 			$this->logger->debug("Detected forced unload of chunk " . $chunkX . " " . $chunkZ);
 			$this->unloadChunk($chunkX, $chunkZ);
 		}
+	}
+
+	/**
+	 * @return Chunk|null
+	 */
+	public function getChunk() : ?Chunk{
+		return $this->getWorld()->getChunk($this->getPosition()->getX() >> 4, $this->getPosition()->getZ() >> 4);
+	}
+
+	/**
+	 * @param float $value
+	 *
+	 * @return void
+	 */
+	public function setFlySpeed(float $value) : void{
+		$this->flySpeed = $value;
+		$this->getNetworkSession()->syncAbilities($this);
+	}
+
+	/**
+	 * @return float|int
+	 */
+	public function getFlySpeed() : float|int{
+		return $this->flySpeed;
 	}
 }

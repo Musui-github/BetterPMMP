@@ -83,7 +83,17 @@ class PreSpawnPacketHandler extends PacketHandler{
 			$levelSettings->gameRules = [
 				"naturalregeneration" => new BoolGameRule(false, false) //Hack for client side regeneration
 			];
-			$levelSettings->experiments = new Experiments([], false);
+			$levelSettings->experiments = new Experiments([
+				"wild_update" => true,
+				"vanilla_experiments" => true,
+				"data_driven_items" => true,
+				"data_driven_biomes" => true,
+				"scripting" => true,
+				"upcoming_creator_features" => true,
+				"gametest" => true,
+				"experimental_molang_features" => true,
+				"short_sneaking" => false
+			], true);
 
 			$this->session->sendDataPacket(StartGamePacket::create(
 				$this->player->getId(),
@@ -107,7 +117,7 @@ class PreSpawnPacketHandler extends PacketHandler{
 				Uuid::fromString(Uuid::NIL),
 				false,
 				false,
-				new NetworkPermissions(disableClientSounds: true),
+				new NetworkPermissions(disableClientSounds: false),
 				[],
 				0,
 				$typeConverter->getItemTypeDictionary()->getEntries(),

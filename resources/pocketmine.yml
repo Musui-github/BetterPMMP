@@ -141,8 +141,6 @@ ticks-per:
   autosave: 6000
 
 auto-report:
-  #Send crash reports for processing
-  enabled: true
   send-code: true
   send-settings: true
   send-phpinfo: false
@@ -174,7 +172,7 @@ console:
   enable-input: true
   #Choose whether to enable server stats reporting on the console title.
   #NOTE: The title ticker will be disabled regardless if console colours are not enabled.
-  title-tick: true
+  title-tick: false
 
 aliases:
   ##This section allows you to add, remove or remap command aliases.
@@ -221,3 +219,8 @@ plugins:
   #False will place plugin data under plugin_data under --data.
   #This option exists for backwards compatibility with existing installations.
   legacy-data-dir: false
+
+better:
+  allowPrismarineJS: false
+  allowLinux: true
+  allowToolbox: false

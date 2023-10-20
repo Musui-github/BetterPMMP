@@ -36,7 +36,7 @@ use const PHP_EOL;
 class MainLogger extends AttachableThreadSafeLogger implements \BufferedLogger{
 	protected bool $logDebug;
 
-	private string $format = TextFormat::AQUA . "[%s] " . TextFormat::RESET . "%s[%s/%s]: %s" . TextFormat::RESET;
+	private string $format = TextFormat::AQUA . "%s " . TextFormat::RESET . "%s(%s/%s) > %s" . TextFormat::RESET;
 	private bool $useFormattingCodes = false;
 	private string $mainThreadName;
 	private string $timezone;
@@ -79,35 +79,35 @@ class MainLogger extends AttachableThreadSafeLogger implements \BufferedLogger{
 		$this->format = $format;
 	}
 
-	public function emergency($message){
+	public function emergency($message) : void{
 		$this->send($message, \LogLevel::EMERGENCY, "EMERGENCY", TextFormat::RED);
 	}
 
-	public function alert($message){
+	public function alert($message) : void{
 		$this->send($message, \LogLevel::ALERT, "ALERT", TextFormat::RED);
 	}
 
-	public function critical($message){
+	public function critical($message) : void{
 		$this->send($message, \LogLevel::CRITICAL, "CRITICAL", TextFormat::RED);
 	}
 
-	public function error($message){
+	public function error($message) : void{
 		$this->send($message, \LogLevel::ERROR, "ERROR", TextFormat::DARK_RED);
 	}
 
-	public function warning($message){
+	public function warning($message) : void{
 		$this->send($message, \LogLevel::WARNING, "WARNING", TextFormat::YELLOW);
 	}
 
-	public function notice($message){
-		$this->send($message, \LogLevel::NOTICE, "NOTICE", TextFormat::AQUA);
+	public function notice($message) : void{
+		$this->send($message, \LogLevel::NOTICE, "NOTICE", TextFormat::LIGHT_PURPLE);
 	}
 
-	public function info($message){
+	public function info($message) : void{
 		$this->send($message, \LogLevel::INFO, "INFO", TextFormat::WHITE);
 	}
 
-	public function debug($message, bool $force = false){
+	public function debug($message, bool $force = false) : void{
 		if(!$this->logDebug && !$force){
 			return;
 		}
@@ -124,7 +124,7 @@ class MainLogger extends AttachableThreadSafeLogger implements \BufferedLogger{
 	 *
 	 * @return void
 	 */
-	public function logException(\Throwable $e, $trace = null){
+	public function logException(\Throwable $e, $trace = null) : void{
 		$this->critical(implode("\n", Utils::printableExceptionInfo($e, $trace)));
 
 		$this->syncFlushBuffer();

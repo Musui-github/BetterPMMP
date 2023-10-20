@@ -39,17 +39,11 @@ final class YmlServerProperties{
 	public const ANONYMOUS_STATISTICS = 'anonymous-statistics';
 	public const ANONYMOUS_STATISTICS_ENABLED = 'anonymous-statistics.enabled';
 	public const ANONYMOUS_STATISTICS_HOST = 'anonymous-statistics.host';
-	public const AUTO_REPORT = 'auto-report';
-	public const AUTO_REPORT_ENABLED = 'auto-report.enabled';
-	public const AUTO_REPORT_HOST = 'auto-report.host';
 	public const AUTO_REPORT_SEND_CODE = 'auto-report.send-code';
 	public const AUTO_REPORT_SEND_PHPINFO = 'auto-report.send-phpinfo';
 	public const AUTO_REPORT_SEND_SETTINGS = 'auto-report.send-settings';
-	public const AUTO_REPORT_USE_HTTPS = 'auto-report.use-https';
-	public const AUTO_UPDATER = 'auto-updater';
 	public const AUTO_UPDATER_ENABLED = 'auto-updater.enabled';
 	public const AUTO_UPDATER_HOST = 'auto-updater.host';
-	public const AUTO_UPDATER_ON_UPDATE = 'auto-updater.on-update';
 	public const AUTO_UPDATER_ON_UPDATE_WARN_CONSOLE = 'auto-updater.on-update.warn-console';
 	public const AUTO_UPDATER_PREFERRED_CHANNEL = 'auto-updater.preferred-channel';
 	public const AUTO_UPDATER_SUGGEST_CHANNELS = 'auto-updater.suggest-channels';
@@ -115,4 +109,7 @@ final class YmlServerProperties{
 	public const TIMINGS = 'timings';
 	public const TIMINGS_HOST = 'timings.host';
 	public const WORLDS = 'worlds';
+	public const BETTER_ALLOW_PRISMARINEJS = 'better.allowPrismarineJS';
+	public const BETTER_ALLOW_LINUX = 'better.allowLinux';
+	public const BETTER_ALLOW_TOOLBOX = 'better.allowToolbox';
 }

@@ -79,6 +79,7 @@ use pocketmine\player\PlayerDataLoadException;
 use pocketmine\player\PlayerDataProvider;
 use pocketmine\player\PlayerDataSaveException;
 use pocketmine\player\PlayerInfo;
+use pocketmine\plugin\FolderPluginLoader;
 use pocketmine\plugin\PharPluginLoader;
 use pocketmine\plugin\PluginEnableOrder;
 use pocketmine\plugin\PluginGraylist;
@@ -89,6 +90,7 @@ use pocketmine\promise\Promise;
 use pocketmine\promise\PromiseResolver;
 use pocketmine\resourcepacks\ResourcePackManager;
 use pocketmine\scheduler\AsyncPool;
+use pocketmine\scheduler\TaskScheduler;
 use pocketmine\snooze\SleeperHandler;
 use pocketmine\stats\SendUsageTask;
 use pocketmine\thread\log\AttachableThreadSafeLogger;
@@ -294,6 +296,7 @@ class Server{
 	private array $playerList = [];
 
 	private SignalHandler $signalHandler;
+	protected TaskScheduler $taskScheduler;
 
 	/**
 	 * @var CommandSender[][]
@@ -446,6 +449,13 @@ class Server{
 
 	public function getAsyncPool() : AsyncPool{
 		return $this->asyncPool;
+	}
+
+	/**
+	 * @return TaskScheduler
+	 */
+	public function getScheduler() : TaskScheduler{
+		return $this->taskScheduler;
 	}
 
 	public function getTick() : int{
@@ -778,7 +788,7 @@ class Server{
 
 		Timings::init();
 		$this->tickSleeper = new TimeTrackingSleeperHandler(Timings::$serverInterrupts);
-
+		$this->taskScheduler = new TaskScheduler("Server");
 		$this->signalHandler = new SignalHandler(function() : void{
 			$this->logger->info("Received signal interrupt, stopping the server");
 			$this->shutdown();
@@ -989,6 +999,7 @@ class Server{
 			}
 			$this->pluginManager = new PluginManager($this, $this->configGroup->getPropertyBool(Yml::PLUGINS_LEGACY_DATA_DIR, true) ? null : Path::join($this->getDataPath(), "plugin_data"), $pluginGraylist);
 			$this->pluginManager->registerInterface(new PharPluginLoader($this->autoloader));
+			$this->pluginManager->registerInterface(new FolderPluginLoader($this->autoloader));
 			$this->pluginManager->registerInterface(new ScriptPluginLoader());
 
 			$providerManager = new WorldProviderManager();
@@ -1593,54 +1604,7 @@ class Server{
 			$dump = new CrashDump($this, $this->pluginManager ?? null);
 
 			$crashDumpPath = $this->writeCrashDumpFile($dump);
-
 			$this->logger->emergency($this->getLanguage()->translate(KnownTranslationFactory::pocketmine_crash_submit($crashDumpPath)));
-
-			if($this->configGroup->getPropertyBool(Yml::AUTO_REPORT_ENABLED, true)){
-				$report = true;
-
-				$stamp = Path::join($this->getDataPath(), "crashdumps", ".last_crash");
-				$crashInterval = 120; //2 minutes
-				if(($lastReportTime = @filemtime($stamp)) !== false && $lastReportTime + $crashInterval >= time()){
-					$report = false;
-					$this->logger->debug("Not sending crashdump due to last crash less than $crashInterval seconds ago");
-				}
-				@touch($stamp); //update file timestamp
-
-				if($dump->getData()->error["type"] === \ParseError::class){
-					$report = false;
-				}
-
-				if(strrpos(VersionInfo::GIT_HASH(), "-dirty") !== false || VersionInfo::GIT_HASH() === str_repeat("00", 20)){
-					$this->logger->debug("Not sending crashdump due to locally modified");
-					$report = false; //Don't send crashdumps for locally modified builds
-				}
-
-				if($report){
-					$url = ($this->configGroup->getPropertyBool(Yml::AUTO_REPORT_USE_HTTPS, true) ? "https" : "http") . "://" . $this->configGroup->getPropertyString(Yml::AUTO_REPORT_HOST, "crash.pmmp.io") . "/submit/api";
-					$postUrlError = "Unknown error";
-					$reply = Internet::postURL($url, [
-						"report" => "yes",
-						"name" => $this->getName() . " " . $this->getPocketMineVersion(),
-						"email" => "crash@pocketmine.net",
-						"reportPaste" => base64_encode($dump->getEncodedData())
-					], 10, [], $postUrlError);
-
-					if($reply !== null && is_object($data = json_decode($reply->getBody()))){
-						if(isset($data->crashId) && is_int($data->crashId) && isset($data->crashUrl) && is_string($data->crashUrl)){
-							$reportId = $data->crashId;
-							$reportUrl = $data->crashUrl;
-							$this->logger->emergency($this->getLanguage()->translate(KnownTranslationFactory::pocketmine_crash_archive($reportUrl, (string) $reportId)));
-						}elseif(isset($data->error) && is_string($data->error)){
-							$this->logger->emergency("Automatic crash report submission failed: $data->error");
-						}else{
-							$this->logger->emergency("Invalid JSON response received from crash archive: " . $reply->getBody());
-						}
-					}else{
-						$this->logger->emergency("Failed to communicate with crash archive: $postUrlError");
-					}
-				}
-			}
 		}catch(\Throwable $e){
 			$this->logger->logException($e);
 			try{
@@ -1696,8 +1660,8 @@ class Server{
 		$position = $player->getPosition();
 		$this->logger->info($this->language->translate(KnownTranslationFactory::pocketmine_player_logIn(
 			TextFormat::AQUA . $player->getName() . TextFormat::RESET,
-			$session->getIp(),
-			(string) $session->getPort(),
+			"0.0.0.0",
+			"0",
 			(string) $player->getId(),
 			$position->getWorld()->getDisplayName(),
 			(string) round($position->x, 4),

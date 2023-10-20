@@ -46,7 +46,14 @@ class EnchantCommand extends VanillaCommand{
 		]);
 	}
 
-	public function execute(CommandSender $sender, string $commandLabel, array $args){
+	/**
+	 * @param CommandSender $sender
+	 * @param string        $commandLabel
+	 * @param array         $args
+	 *
+	 * @return bool
+	 */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) : bool{
 		if(count($args) < 2){
 			throw new InvalidCommandSyntaxException();
 		}

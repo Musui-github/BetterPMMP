@@ -56,12 +56,11 @@ class Bow extends Tool implements Releasable{
 			return ItemUseResult::FAIL();
 		}
 
-		$location = $player->getLocation();
-
 		$diff = $player->getItemUseDuration();
 		$p = $diff / 20;
 		$baseForce = min((($p ** 2) + $p * 2) / 3, 1);
 
+		$location=$player->getLocation();
 		$entity = new ArrowEntity(Location::fromObject(
 			$player->getEyePos(),
 			$player->getWorld(),
@@ -92,11 +91,6 @@ class Bow extends Tool implements Releasable{
 		$ev->call();
 
 		$entity = $ev->getProjectile(); //This might have been changed by plugins
-
-		if($ev->isCancelled()){
-			$entity->flagForDespawn();
-			return ItemUseResult::FAIL();
-		}
 
 		$entity->setMotion($entity->getMotion()->multiply($ev->getForce()));
 

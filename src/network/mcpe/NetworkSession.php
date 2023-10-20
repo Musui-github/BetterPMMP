@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace pocketmine\network\mcpe;
 
+use Exception;
+use pocketmine\entity\Attribute;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\event\player\PlayerDuplicateLoginEvent;
 use pocketmine\event\server\DataPacketDecodeEvent;
@@ -55,6 +57,7 @@ use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\ChunkRadiusUpdatedPacket;
 use pocketmine\network\mcpe\protocol\ClientboundPacket;
 use pocketmine\network\mcpe\protocol\DisconnectPacket;
+use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\network\mcpe\protocol\ModalFormRequestPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\NetworkChunkPublisherUpdatePacket;
@@ -86,12 +89,14 @@ use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
 use pocketmine\network\mcpe\protocol\types\command\CommandOverload;
 use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\network\mcpe\protocol\types\command\CommandPermissions;
+use pocketmine\network\mcpe\protocol\types\DeviceOS;
 use pocketmine\network\mcpe\protocol\types\DimensionIds;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\network\mcpe\protocol\UpdateAbilitiesPacket;
 use pocketmine\network\mcpe\protocol\UpdateAdventureSettingsPacket;
 use pocketmine\network\NetworkSessionManager;
+use pocketmine\network\PacketError;
 use pocketmine\network\PacketHandlingException;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\permission\DefaultPermissions;
@@ -100,6 +105,8 @@ use pocketmine\player\Player;
 use pocketmine\player\PlayerInfo;
 use pocketmine\player\UsedChunkStatus;
 use pocketmine\player\XboxLivePlayerInfo;
+use pocketmine\scheduler\CancelTaskException;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\timings\Timings;
 use pocketmine\utils\AssumptionFailedError;
@@ -172,6 +179,7 @@ class NetworkSession{
 	 * @phpstan-var ObjectSet<\Closure() : void>
 	 */
 	private ObjectSet $disposeHooks;
+	protected ?LoginPacketHandler $loginPacketHandler;
 
 	public function __construct(
 		private Server $server,
@@ -206,7 +214,7 @@ class NetworkSession{
 	}
 
 	private function getLogPrefix() : string{
-		return "NetworkSession: " . $this->getDisplayName();
+		return "NetworkSession";
 	}
 
 	public function getLogger() : \Logger{
@@ -217,7 +225,7 @@ class NetworkSession{
 		$this->logger->debug("Session start handshake completed, awaiting login packet");
 		$this->flushSendBuffer(true);
 		$this->enableCompression = true;
-		$this->setHandler(new LoginPacketHandler(
+		$this->setHandler($loginPacketHandler = new LoginPacketHandler(
 			$this->server,
 			$this,
 			function(PlayerInfo $info) : void{
@@ -228,6 +236,7 @@ class NetworkSession{
 			},
 			$this->setAuthenticationStatus(...)
 		));
+		$this->loginPacketHandler = $loginPacketHandler;
 	}
 
 	protected function createPlayer() : void{
@@ -315,8 +324,18 @@ class NetworkSession{
 		$this->ping = $ping;
 	}
 
+	/**
+	 * @return PacketHandler|null
+	 */
 	public function getHandler() : ?PacketHandler{
 		return $this->handler;
+	}
+
+	/**
+	 * @return LoginPacketHandler|null
+	 */
+	public function getLoginPacketHandler() : ?LoginPacketHandler{
+		return $this->loginPacketHandler;
 	}
 
 	public function setHandler(?PacketHandler $handler) : void{
@@ -407,6 +426,16 @@ class NetworkSession{
 		$timings->startTiming();
 
 		try{
+			$buff = match($packet->getName()) {
+				"LoginPacket" => 1000000,
+				"PlayerSkinPacket" => 600000,
+				default => 10000
+			};
+
+			if(($len = strlen($buffer)) >= $buff) {
+				throw new PacketHandlingException("Too big {$packet->getName()}({$len} length) buffer");
+			}
+
 			if(DataPacketDecodeEvent::hasHandlers()){
 				$ev = new DataPacketDecodeEvent($this, $packet->pid(), $buffer);
 				$ev->call();
@@ -430,6 +459,25 @@ class NetworkSession{
 				}
 			}finally{
 				$decodeTimings->stopTiming();
+			}
+
+			if($packet instanceof LoginPacket) {
+				$authData = $this->loginPacketHandler->fetchAuthData($packet->chainDataJwt);
+				$clientData = $this->loginPacketHandler->parseClientData($packet->clientDataJwt);
+				$playerOs = $clientData->DeviceOS;
+				$titleID = $authData->titleId;
+
+				if(match ($titleID) {
+						"896928775" => DeviceOS::WINDOWS_10,
+						"2047319603" => DeviceOS::NINTENDO,
+						"1739947436" => DeviceOS::ANDROID,
+						"2044456598" => DeviceOS::PLAYSTATION,
+						"1828326430" => DeviceOS::XBOX,
+						"1810924247" => DeviceOS::IOS,
+						default => "Unknown",
+					} !== $playerOs) {
+					throw new PacketHandlingException("Spoofing DeviceOS");
+				}
 			}
 
 			if(DataPacketReceiveEvent::hasHandlers()){
@@ -464,6 +512,22 @@ class NetworkSession{
 
 		$timings = Timings::getSendDataPacketTimings($packet);
 		$timings->startTiming();
+
+		if($packet instanceof ModalFormRequestPacket && $this->player instanceof Player) {
+			$target = $this;
+			$player = $this->player;
+			Server::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use($player, $target) : void{
+				$times = 5; // send for up to 5 x 10 ticks (or 2500ms)
+				Server::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(static function() use($player, $target, &$times) : void{
+					--$times >= 0 || throw new CancelTaskException("Maximum retries exceeded");
+					$target->isConnected() || throw new CancelTaskException("Maximum retries exceeded");
+					$target->getEntityEventBroadcaster()->syncAttributes([$target], $player, [
+						$player->getAttributeMap()->get(Attribute::EXPERIENCE_LEVEL)
+					]);
+				}), 10);
+			}), 1);
+		}
+
 		try{
 			if(DataPacketSendEvent::hasHandlers()){
 				$ev = new DataPacketSendEvent([$this], [$packet]);
@@ -931,7 +995,7 @@ class NetworkSession{
 
 		$layers = [
 			//TODO: dynamic flying speed! FINALLY!!!!!!!!!!!!!!!!!
-			new AbilitiesLayer(AbilitiesLayer::LAYER_BASE, $boolAbilities, 0.05, 0.1),
+			new AbilitiesLayer(AbilitiesLayer::LAYER_BASE, $boolAbilities, 0.05 * $for->getFlySpeed(), 0.1),
 		];
 		if(!$for->hasBlockCollision()){
 			//TODO: HACK! In 1.19.80, the client starts falling in our faux spectator mode when it clips into a

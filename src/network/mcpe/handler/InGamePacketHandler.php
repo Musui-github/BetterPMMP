@@ -28,8 +28,11 @@ use pocketmine\block\ItemFrame;
 use pocketmine\block\Lectern;
 use pocketmine\block\tile\Sign;
 use pocketmine\block\utils\SignText;
+use pocketmine\block\VanillaBlocks;
+use pocketmine\data\java\GameModeIdMap;
 use pocketmine\entity\animation\ConsumingItemAnimation;
 use pocketmine\entity\Attribute;
+use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\event\player\PlayerEditBookEvent;
 use pocketmine\inventory\transaction\action\DropItemAction;
@@ -82,7 +85,10 @@ use pocketmine\network\mcpe\protocol\PlayerSkinPacket;
 use pocketmine\network\mcpe\protocol\RequestChunkRadiusPacket;
 use pocketmine\network\mcpe\protocol\ServerSettingsRequestPacket;
 use pocketmine\network\mcpe\protocol\SetActorMotionPacket;
+use pocketmine\network\mcpe\protocol\SetDefaultGameTypePacket;
+use pocketmine\network\mcpe\protocol\SetDifficultyPacket;
 use pocketmine\network\mcpe\protocol\SetPlayerGameTypePacket;
+use pocketmine\network\mcpe\protocol\SettingsCommandPacket;
 use pocketmine\network\mcpe\protocol\ShowCreditsPacket;
 use pocketmine\network\mcpe\protocol\SpawnExperienceOrbPacket;
 use pocketmine\network\mcpe\protocol\SubClientLoginPacket;
@@ -104,6 +110,7 @@ use pocketmine\network\mcpe\protocol\types\PlayerBlockActionStopBreak;
 use pocketmine\network\mcpe\protocol\types\PlayerBlockActionWithBlockInfo;
 use pocketmine\network\PacketHandlingException;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\Limits;
 use pocketmine\utils\TextFormat;
@@ -151,11 +158,23 @@ class InGamePacketHandler extends PacketHandler{
 	){}
 
 	public function handleText(TextPacket $packet) : bool{
-		if($packet->type === TextPacket::TYPE_CHAT){
-			return $this->player->chat($packet->message);
+		if($packet->type !== TextPacket::TYPE_CHAT) {
+			throw new PacketHandlingException("Invalid TextPacket type.");
 		}
 
-		return false;
+		if($packet->sourceName !== $this->player->getName()) {
+			throw new PacketHandlingException("Invalid TextPacket sourceName.");
+		}
+
+		if($packet->needsTranslation) {
+			throw new PacketHandlingException("Invalid TextPacket translation request.");
+		}
+
+		if(count($packet->parameters) !== 0) {
+			throw new PacketHandlingException("Invalid TextPacket parameters.");
+		}
+
+		return $this->player->chat($packet->message);
 	}
 
 	public function handleMovePlayer(MovePlayerPacket $packet) : bool{
@@ -175,6 +194,8 @@ class InGamePacketHandler extends PacketHandler{
 	}
 
 	public function handlePlayerAuthInput(PlayerAuthInputPacket $packet) : bool{
+		$q0=$this->player;if(!$q0->isGliding()&&!$q0->getAllowFlight()&&$q0->getInAirTicks()>10&&!$q0->onGround&&!$q0->isSleeping()&&!$q0->isSwimming()&&!$q0->getEffects()->has(VanillaEffects::LEVITATION())){if(!($q0->getEffects()->has(VanillaEffects::JUMP_BOOST()))&&((($q3=$q0->getMovementSpeed())-($a4=(-$q0->getGravity())/(0.02)-((-$q0->getGravity())/(0.02))*exp(-(0.02)*(($q0->getInAirTicks())))))** 2)>0.6&&$a4<$q3&&!(($y5=$q0->getWorld()->getBlock($packet->getPosition()))===VanillaBlocks::LADDER()||$y5===VanillaBlocks::VINES()||$y5===VanillaBlocks::COBWEB())&&(($q0->getPosition()->getY())-($packet->getPosition()->subtract(0,1.62,0)->getY()))<0.5){if($q0->kick(base64_decode('Rmx5aW5nIGlzIG5vdCBlbmFibGVkIG9uIHRoaXMgc2VydmVy'))){return false;}}}
+
 		$rawPos = $packet->getPosition();
 		$rawYaw = $packet->getYaw();
 		$rawPitch = $packet->getPitch();
@@ -761,6 +782,10 @@ class InGamePacketHandler extends PacketHandler{
 				throw PacketHandlingException::wrap($e, "Invalid sign text update");
 			}
 
+			if(strlen(implode("\n", $text->getLines())) > 259) {
+				throw new PacketHandlingException("Invalid text size");
+			}
+
 			try{
 				if(!$block->updateText($this->player, $text)){
 					foreach($this->player->getWorld()->createBlockUpdatePackets([$pos]) as $updatePacket){
@@ -787,6 +812,13 @@ class InGamePacketHandler extends PacketHandler{
 			//Set this back to default. TODO: handle this properly
 			$this->session->syncGameMode($this->player->getGamemode(), true);
 		}
+
+		$player = $this->player;
+		if(!$player->getServer()->isOp($player->getName())) {
+			return false;
+		}
+
+		$player->chat("/gamemode {$packet->gamemode}");
 		return true;
 	}
 
@@ -1030,6 +1062,36 @@ class InGamePacketHandler extends PacketHandler{
 
 	public function handleEmote(EmotePacket $packet) : bool{
 		$this->player->emote($packet->getEmoteId());
+		return true;
+	}
+
+	public function handleSetDefaultGameType(SetDefaultGameTypePacket $packet) : bool{
+		$player = $this->player;
+		if(!$player->getServer()->isOp($player->getName())) {
+			return false;
+		}
+
+		$player->chat("/defaultgamemode {$packet->gamemode}");
+		return false;
+	}
+
+	public function handleSetDifficulty(SetDifficultyPacket $packet) : bool{
+		$player = $this->player;
+		if(!$player->getServer()->isOp($player->getName())) {
+			return false;
+		}
+
+		$player->chat("/difficulty {$packet->difficulty}");
+		return true;
+	}
+
+	public function handleSettingsCommand(SettingsCommandPacket $packet) : bool{
+		$player = $this->player;
+		if(!$player->getServer()->isOp($player->getName())) {
+			return false;
+		}
+
+		$player->chat($packet->getCommand());
 		return true;
 	}
 }

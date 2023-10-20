@@ -265,7 +265,7 @@ class RakLibInterface implements ServerEventListener, AdvancedNetworkInterface{
 				"MCPE",
 				rtrim(addcslashes($name, ";"), '\\'),
 				ProtocolInfo::CURRENT_PROTOCOL,
-				ProtocolInfo::MINECRAFT_VERSION_NETWORK,
+				""/*ProtocolInfo::MINECRAFT_VERSION_NETWORK*/, // BEST MOTD
 				$info->getPlayerCount(),
 				$info->getMaxPlayerCount(),
 				$this->rakServerId,
