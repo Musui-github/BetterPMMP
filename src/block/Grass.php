@@ -89,7 +89,7 @@ class Grass extends Opaque{
 		$world = $this->position->getWorld();
 		if($item instanceof Fertilizer){
 			$item->pop();
-			TallGrassObject::growGrass($world, $this->position, new Random(mt_rand()), ($rapidFertilizer = $item instanceof RapidFertilizer) ? 16 : 8, $rapidFertilizer ? 6 : 2);
+			TallGrassObject::growGrass($world, $this->position, new Random(mt_rand()), ($rapidFertilizer = $item instanceof RapidFertilizer) ? 40 : 8, $rapidFertilizer ? 20 : 2);
 
 			return true;
 		}
