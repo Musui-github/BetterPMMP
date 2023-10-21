@@ -311,6 +311,17 @@ use pocketmine\world\World;
  * @method static WritableBook WRITABLE_BOOK()
  * @method static WrittenBook WRITTEN_BOOK()
  * @method static SpawnEgg ZOMBIE_SPAWN_EGG()
+ *
+ * @method static Balloon BALLOON()
+ * @method static WarpedFungusOnAStick WARPED_FUNGUS_ON_A_STICK()
+ * @method static Item LODESTONE_COMPASS()
+ * @method static IceBomb ICE_BOMB()
+ * @method static RapidFertilizer RAPID_FERTILIZER()
+ * @method static Sparkler SPARKLER()
+ * @method static HorseArmor LEATHER_HORSE_ARMOR()
+ * @method static HorseArmor IRON_HORSE_ARMOR()
+ * @method static HorseArmor GOLDEN_HORSE_ARMOR()
+ * @method static HorseArmor DIAMOND_HORSE_ARMOR()
  */
 final class VanillaItems{
 	use CloningRegistryTrait;
@@ -545,6 +556,19 @@ final class VanillaItems{
 		self::register("wheat_seeds", new WheatSeeds(new IID(Ids::WHEAT_SEEDS), "Wheat Seeds"));
 		self::register("writable_book", new WritableBook(new IID(Ids::WRITABLE_BOOK), "Book & Quill"));
 		self::register("written_book", new WrittenBook(new IID(Ids::WRITTEN_BOOK), "Written Book"));
+
+		/* BETTER PMMP */
+		self::register("balloon", new Balloon(new IID(Ids::BALLOON), "Balloon"));
+		self::register("warped_fungus_on_a_stick", new WarpedFungusOnAStick(new IID(Ids::WARPED_FUNGUS_ON_A_STICK), "Warped fungus on a stick"));
+		self::register("lodestone_compass", new Item(new IID(Ids::LODESTONE_COMPASS), "Lodestone compass"));
+		self::register("ice_bomb", new IceBomb(new IID(Ids::ICE_BOMB), "Ice bomb"));
+		self::register("rapid_fertilizer", new RapidFertilizer(new IID(Ids::RAPID_FERTILIZER), "Rapid fertilizer"));
+		self::register("sparkler", new Sparkler(new IID(Ids::SPARKLER), "Sparkler"));
+
+		self::register("leather_horse_armor", new HorseArmor(new IID(Ids::LEATHER_HORSE_ARMOR), HorseArmor::TYPE_LEATHER, "Leather horse armor"));
+		self::register("iron_horse_armor", new HorseArmor(new IID(Ids::IRON_HORSE_ARMOR), HorseArmor::TYPE_IRON, "Iron horse armor"));
+		self::register("golden_horse_armor", new HorseArmor(new IID(Ids::GOLDEN_HORSE_ARMOR), HorseArmor::TYPE_GOLDEN, "Golden horse armor"));
+		self::register("diamond_horse_armor", new HorseArmor(new IID(Ids::DIAMOND_HORSE_ARMOR), HorseArmor::TYPE_DIAMOND, "Diamond horse armor"));
 
 		foreach(BoatType::getAll() as $type){
 			//boat type is static, because different types of wood may have different properties

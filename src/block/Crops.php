@@ -27,6 +27,7 @@ use pocketmine\block\utils\BlockEventHelper;
 use pocketmine\data\runtime\RuntimeDataDescriber;
 use pocketmine\item\Fertilizer;
 use pocketmine\item\Item;
+use pocketmine\item\RapidFertilizer;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -64,7 +65,7 @@ abstract class Crops extends Flowable{
 	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []) : bool{
 		if($this->age < self::MAX_AGE && $item instanceof Fertilizer){
 			$block = clone $this;
-			$block->age += mt_rand(2, 5);
+			$block->age += $item  instanceof RapidFertilizer ? self::MAX_AGE : mt_rand(2, 5);
 			if($block->age > self::MAX_AGE){
 				$block->age = self::MAX_AGE;
 			}

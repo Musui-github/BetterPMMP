@@ -197,7 +197,26 @@ class InGamePacketHandler extends PacketHandler{
 	}
 
 	public function handlePlayerAuthInput(PlayerAuthInputPacket $packet) : bool{
-		$q0=$this->player;if(!$q0->isGliding()&&!$q0->getAllowFlight()&&$q0->getInAirTicks()>10&&!$q0->onGround&&!$q0->isSleeping()&&!$q0->isSwimming()&&!$q0->getEffects()->has(VanillaEffects::LEVITATION())){if(!($q0->getEffects()->has(VanillaEffects::JUMP_BOOST()))&&((($q3=$q0->getMovementSpeed())-($a4=(-$q0->getGravity())/(0.02)-((-$q0->getGravity())/(0.02))*exp(-(0.02)*(($q0->getInAirTicks())))))** 2)>0.6&&$a4<$q3&&!(($y5=$q0->getWorld()->getBlock($packet->getPosition()))===VanillaBlocks::LADDER()||$y5===VanillaBlocks::VINES()||$y5===VanillaBlocks::COBWEB())&&(($q0->getPosition()->getY())-($packet->getPosition()->subtract(0,1.62,0)->getY()))<0.5){if($q0->kick(base64_decode('Rmx5aW5nIGlzIG5vdCBlbmFibGVkIG9uIHRoaXMgc2VydmVy'))){return false;}}}
+		$player = $this->player;
+		if(
+			!$player->isGliding() &&
+			!$player->getAllowFlight() &&
+			$player->getInAirTicks() > 10 &&
+			!$player->onGround &&
+			!$player->isSleeping() &&
+			!$player->isSwimming() &&
+			!$player->getEffects()->has(VanillaEffects::LEVITATION()) &&
+			$player->lastDamageTicks > 10)
+		{
+			$ignore = ($block = $player->getWorld()->getBlock($packet->getPosition())) === VanillaBlocks::LADDER() || $block === VanillaBlocks::VINES() || $block === VanillaBlocks::COBWEB();
+			$expectedVelocity = (-$player->getGravity()) / (0.02) - ((-$player->getGravity()) / (0.02)) * exp(-(0.02) * (($player->getInAirTicks())));
+			$ydiff = $player->getPosition()->getY() - $packet->getPosition()->subtract(0, 1.62, 0)->getY();
+			if(!$player->getEffects()->has(VanillaEffects::JUMP_BOOST()) && (($movementSpeed = $player->getMovementSpeed()) - $expectedVelocity) ** 2 > 0.6 && $expectedVelocity < $movementSpeed && !$ignore && $ydiff < 0.5) {
+				if(!$player->kick("Flying is not enabled on this server")){
+					$player->setMotion(new Vector3(0, $expectedVelocity, 0));
+				}
+			}
+		}
 
 		$rawPos = $packet->getPosition();
 		$rawYaw = $packet->getYaw();
@@ -1017,14 +1036,15 @@ class InGamePacketHandler extends PacketHandler{
 	}
 
 	public function handleServerSettingsRequest(ServerSettingsRequestPacket $packet) : bool{
-		Server::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($packet) {
-			$form = Form::getServerFormOf($packet->player);
+		$player = $this->player;
+		Server::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($player, $packet) {
+			$form = Form::getServerFormOf($player);
 			$response = new ServerSettingsResponsePacket();
-			$response->formId = Form::getIdOf($packet->player);
+			$response->formId = Form::getIdOf($player);
 			$response->formData = json_encode($form->jsonSerialize());
-			$packet->player->getNetworkSession()->sendDataPacket($response);
+			$player->getNetworkSession()->sendDataPacket($response);
 		}), 20);
-		return false;
+		return true;
 	}
 
 	public function handleLabTable(LabTablePacket $packet) : bool{

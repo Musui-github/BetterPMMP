@@ -2,6 +2,8 @@
 
 namespace pocketmine\form;
 
+use pocketmine\network\PacketHandlingException;
+
 class CustomForm extends Form{
 	private array $labelMap = [];
 	private array $validationMethods = [];
@@ -31,7 +33,7 @@ class CustomForm extends Form{
 					throw new FormValidationException("Invalid element " . $i);
 				}
 				if(!$validationMethod($v)) {
-					throw new FormValidationException("Invalid type given for element " . $this->labelMap[$i]);
+					throw new PacketHandlingException("Invalid type given for element " . $this->labelMap[$i]);
 				}
 				$new[$this->labelMap[$i]] = $v;
 			}

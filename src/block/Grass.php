@@ -28,6 +28,7 @@ use pocketmine\block\utils\DirtType;
 use pocketmine\item\Fertilizer;
 use pocketmine\item\Hoe;
 use pocketmine\item\Item;
+use pocketmine\item\RapidFertilizer;
 use pocketmine\item\Shovel;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
@@ -88,7 +89,7 @@ class Grass extends Opaque{
 		$world = $this->position->getWorld();
 		if($item instanceof Fertilizer){
 			$item->pop();
-			TallGrassObject::growGrass($world, $this->position, new Random(mt_rand()), 8, 2);
+			TallGrassObject::growGrass($world, $this->position, new Random(mt_rand()), ($rapidFertilizer = $item instanceof RapidFertilizer) ? 16 : 8, $rapidFertilizer ? 6 : 2);
 
 			return true;
 		}

@@ -145,6 +145,7 @@ abstract class Entity{
 	public bool $isCollidedVertically = false;
 
 	public int $noDamageTicks = 0;
+	public int $lastDamageTicks = 0;
 	protected bool $justCreated = true;
 
 	protected AttributeMap $attributeMap;

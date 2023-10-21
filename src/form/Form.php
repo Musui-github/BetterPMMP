@@ -20,7 +20,7 @@ abstract class Form implements IForm {
 	/** @var callable|null */
 	private $callable;
 
-	public static function setServerForm(Player $player, ServerForm $form) {
+	public static function setServerForm(Player $player, ServerForm $form) : void{
 		if (!isset(self::$serverForm)) {
 			self::$serverForm = new WeakMap();
 		}
@@ -87,7 +87,7 @@ abstract class Form implements IForm {
 		return $this->callable;
 	}
 
-	public function setCallable(?callable $callable) {
+	public function setCallable(?callable $callable) : void{
 		$this->callable = $callable;
 	}
 

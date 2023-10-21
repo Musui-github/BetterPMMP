@@ -306,6 +306,16 @@ final class ItemTypeIds{
 	public const ENCHANTED_BOOK = 20267;
 
 	public const FIRST_UNUSED_ITEM_ID = 20268;
+	public const BALLOON = 90268;
+	public const WARPED_FUNGUS_ON_A_STICK = 90269;
+	public const LODESTONE_COMPASS = 90270;
+	public const ICE_BOMB = 90271;
+	public const RAPID_FERTILIZER = 90272;
+	public const SPARKLER = 90273;
+	public const LEATHER_HORSE_ARMOR = 90274;
+	public const IRON_HORSE_ARMOR = 90275;
+	public const GOLDEN_HORSE_ARMOR = 90276;
+	public const DIAMOND_HORSE_ARMOR = 90277;
 
 	private static int $nextDynamicId = self::FIRST_UNUSED_ITEM_ID;
 

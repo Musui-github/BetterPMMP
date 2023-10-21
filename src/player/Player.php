@@ -60,6 +60,7 @@ use pocketmine\event\player\PlayerEntityInteractEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerExperienceChangeEvent;
 use pocketmine\event\player\PlayerGameModeChangeEvent;
+use pocketmine\event\player\PlayerGameSpeedChangeEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemConsumeEvent;
 use pocketmine\event\player\PlayerItemHeldEvent;
@@ -107,6 +108,7 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\AnimatePacket;
+use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\SetActorMotionPacket;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
@@ -115,6 +117,7 @@ use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\entity\PlayerMetadataFlags;
+use pocketmine\network\mcpe\protocol\types\LevelEvent;
 use pocketmine\network\PacketHandlingException;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\permission\DefaultPermissions;
@@ -1447,6 +1450,7 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 		$this->messageCounter = 2;
 
 		$this->lastUpdate = $currentTick;
+		$this->lastDamageTicks++;
 
 		if($this->justCreated){
 			$this->onFirstUpdate($currentTick);
@@ -1482,6 +1486,17 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 				Timings::$playerCheckNearEntities->startTiming();
 				$this->checkNearEntities();
 				Timings::$playerCheckNearEntities->stopTiming();
+
+				$ev = new PlayerGameSpeedChangeEvent($this, 1, PlayerGameSpeedChangeEvent::SERVER_REASON);
+				$ev->call();
+
+				if($ev->getReason() !== PlayerGameSpeedChangeEvent::SERVER_REASON && $ev->getReason() !== PlayerGameSpeedChangeEvent::PLUGIN_REASON) {
+					$ev->cancel();
+				}
+
+				if(!$ev->isCancelled()) {
+					$this->getNetworkSession()->sendDataPacket(LevelEventPacket::create(LevelEvent::SET_GAME_SPEED, 0, new Vector3($ev->getSpeed(), 0, 0)));
+				}
 			}
 
 			if($this->blockBreakHandler !== null && !$this->blockBreakHandler->update()){
@@ -1927,6 +1942,10 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 			$this->returnItemsFromAction($oldItem, $heldItem, $returnedItems);
 
 			$this->hungerManager->exhaust(0.1, PlayerExhaustEvent::CAUSE_ATTACK);
+		}
+
+		if($entity instanceof Player) {
+			$entity->lastDamageTicks = 0;
 		}
 
 		return true;

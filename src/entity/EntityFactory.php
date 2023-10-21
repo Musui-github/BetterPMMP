@@ -42,6 +42,7 @@ use pocketmine\entity\projectile\Arrow;
 use pocketmine\entity\projectile\Egg;
 use pocketmine\entity\projectile\EnderPearl;
 use pocketmine\entity\projectile\ExperienceBottle;
+use pocketmine\entity\projectile\IceBomb;
 use pocketmine\entity\projectile\Snowball;
 use pocketmine\entity\projectile\SplashPotion;
 use pocketmine\item\Item;
@@ -176,6 +177,11 @@ final class EntityFactory{
 		$this->register(Human::class, function(World $world, CompoundTag $nbt) : Human{
 			return new Human(Helper::parseLocation($nbt, $world), Human::parseSkinNBT($nbt), $nbt);
 		}, ['Human']);
+
+		/* Better PMMP */
+		$this->register(IceBomb::class, function(World $world, CompoundTag $nbt) : IceBomb{
+			return new IceBomb(Helper::parseLocation($nbt, $world), null, $nbt);
+		}, ['IceBomb', 'minecraft:ice_bomb']);
 	}
 
 	/**

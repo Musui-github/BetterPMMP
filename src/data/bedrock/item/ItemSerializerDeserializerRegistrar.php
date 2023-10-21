@@ -375,6 +375,19 @@ final class ItemSerializerDeserializerRegistrar{
 		$this->map1to1Item(Ids::WRITABLE_BOOK, Items::WRITABLE_BOOK());
 		$this->map1to1Item(Ids::WRITTEN_BOOK, Items::WRITTEN_BOOK());
 		$this->map1to1Item(Ids::ZOMBIE_SPAWN_EGG, Items::ZOMBIE_SPAWN_EGG());
+
+		/* BETTER PMMP */
+		$this->map1to1Item(Ids::BALLOON, Items::BALLOON());
+		$this->map1to1Item(Ids::WARPED_FUNGUS_ON_A_STICK, Items::WARPED_FUNGUS_ON_A_STICK());
+		$this->map1to1Item(Ids::LODESTONE_COMPASS, Items::LODESTONE_COMPASS());
+		$this->map1to1Item(Ids::ICE_BOMB, Items::ICE_BOMB());
+		$this->map1to1Item(Ids::RAPID_FERTILIZER, Items::RAPID_FERTILIZER());
+		$this->map1to1Item(Ids::SPARKLER, Items::SPARKLER());
+
+		$this->map1to1Item(Ids::LEATHER_HORSE_ARMOR, Items::LEATHER_HORSE_ARMOR());
+		$this->map1to1Item(Ids::IRON_HORSE_ARMOR, Items::IRON_HORSE_ARMOR());
+		$this->map1to1Item(Ids::GOLDEN_HORSE_ARMOR, Items::GOLDEN_HORSE_ARMOR());
+		$this->map1to1Item(Ids::DIAMOND_HORSE_ARMOR, Items::DIAMOND_HORSE_ARMOR());
 	}
 
 	/**

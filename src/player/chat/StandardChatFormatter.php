@@ -29,8 +29,8 @@ use pocketmine\lang\Translatable;
 /**
  * Standard chat formatter, formats messages in the default Minecraft way.
  */
-final class StandardChatFormatter implements ChatFormatter{
-
+final class StandardChatFormatter implements ChatFormatter
+{
 	public function format(string $username, string $message) : Translatable{
 		return KnownTranslationFactory::chat_type_text($username, $message);
 	}

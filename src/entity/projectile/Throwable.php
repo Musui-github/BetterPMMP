@@ -24,8 +24,10 @@ declare(strict_types=1);
 namespace pocketmine\entity\projectile;
 
 use pocketmine\block\Block;
+use pocketmine\block\Water;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\math\RayTraceResult;
+use pocketmine\math\Vector3;
 
 abstract class Throwable extends Projectile{
 
