@@ -603,7 +603,7 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::COMMANDS_WHITELIST_USAGE, []);
 	}
 
-	public static function commands_experience_usage(int $param, Translatable|string $param0) : Translatable{
+	public static function commands_experience_usage(string $param, Translatable|string $param0) : Translatable{
 		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_USAGE, [
 			0 => $param,
 			1 => $param0,

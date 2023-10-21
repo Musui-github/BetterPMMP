@@ -21,7 +21,7 @@ class ExperienceCommand extends VanillaCommand{
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){
-		if(count($args) === 0){
+		if(count($args) < 2){
 			throw new InvalidCommandSyntaxException();
 		}
 
@@ -29,10 +29,12 @@ class ExperienceCommand extends VanillaCommand{
 		$name = array_shift($args);
 
 		if(($player = $sender->getServer()->getPlayerExact($name)) instanceof Player){
+			$clean = intval($xp);
+
 			if (str_ends_with($xp, "L")) {
-				$player->getXpManager()->addXpLevels($player->getXpManager()->addXp($xp));
+				$player->getXpManager()->addXpLevels($clean);
 			} else {
-				$player->getXpManager()->addXp($xp);
+				$player->getXpManager()->addXp($clean);
 			}
 
 			Command::broadcastCommandMessage($sender, KnownTranslationFactory::commands_experience_usage($xp, $player->getName()));
