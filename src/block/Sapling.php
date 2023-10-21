@@ -23,11 +23,13 @@ declare(strict_types=1);
 
 namespace pocketmine\block;
 
+use pocketmine\block\utils\BlockEventHelper;
 use pocketmine\block\utils\SaplingType;
 use pocketmine\data\runtime\RuntimeDataDescriber;
 use pocketmine\event\block\StructureGrowEvent;
 use pocketmine\item\Fertilizer;
 use pocketmine\item\Item;
+use pocketmine\item\RapidFertilizer;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -68,10 +70,17 @@ class Sapling extends Flowable{
 	}
 
 	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []) : bool{
-		if($item instanceof Fertilizer && $this->grow($player)){
-			$item->pop();
+		if($item instanceof Fertilizer) {
+			$block = clone $this;
 
-			return true;
+			$r = $item instanceof RapidFertilizer ? 2 : mt_rand(1, 10);
+
+			if ($r == 2) {
+				$this->grow($player);
+				$item->pop();
+				return true;
+			}
+			return false;
 		}
 
 		return false;

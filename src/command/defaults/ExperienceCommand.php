@@ -15,7 +15,7 @@ class ExperienceCommand extends VanillaCommand{
 		parent::__construct(
 			"experience",
 			KnownTranslationFactory::pocketmine_command_experience_description(),
-			KnownTranslationFactory::pocketmine_command_experience_description(),
+			KnownTranslationFactory::commands_experience_usage(),
 			["xp"]);
 		$this->setPermission(DefaultPermissionNames::COMMAND_EXPERIENCE);
 	}
@@ -37,7 +37,7 @@ class ExperienceCommand extends VanillaCommand{
 				$player->getXpManager()->addXp($clean);
 			}
 
-			Command::broadcastCommandMessage($sender, KnownTranslationFactory::commands_experience_usage($xp, $player->getName()));
+			Command::broadcastCommandMessage($sender, KnownTranslationFactory::commands_experience_success($xp, $player->getName()));
 		}
 		return true;
 	}
