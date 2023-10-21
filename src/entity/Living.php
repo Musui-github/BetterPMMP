@@ -36,6 +36,7 @@ use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDeathEvent;
+use pocketmine\event\entity\LivingVelocityEvent;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\CallbackInventoryListener;
 use pocketmine\inventory\Inventory;
@@ -52,6 +53,8 @@ use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\network\mcpe\EntityEventBroadcaster;
 use pocketmine\network\mcpe\NetworkBroadcastUtils;
+use pocketmine\network\mcpe\protocol\SetActorLinkPacket;
+use pocketmine\network\mcpe\protocol\types\entity\EntityLink;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataCollection;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
@@ -578,7 +581,7 @@ abstract class Living extends Entity{
 		$this->broadcastAnimation(new HurtAnimation($this));
 	}
 
-	public function knockBack(Entity $entity, float $x, float $z, float $force = self::DEFAULT_KNOCKBACK_FORCE, ?float $verticalLimit = self::DEFAULT_KNOCKBACK_VERTICAL_LIMIT) : void{
+	public function knockBack(Entity $attacker, float $x, float $z, float $force = self::DEFAULT_KNOCKBACK_FORCE, ?float $verticalLimit = self::DEFAULT_KNOCKBACK_VERTICAL_LIMIT) : void{
 		$f = sqrt($x * $x + $z * $z);
 		if($f <= 0){
 			return;
@@ -598,7 +601,11 @@ abstract class Living extends Entity{
 				$motionY = $verticalLimit;
 			}
 
-			$this->setMotion(new Vector3($motionX, $motionY, $motionZ));
+			$ev = new LivingVelocityEvent($this, $attacker, new Vector3($motionX, $motionY, $motionZ), $force, $verticalLimit);
+			$ev->call();
+			if(!$ev->isCancelled()) {
+				$this->setMotion($ev->getVelocity());
+			}
 		}
 	}
 
@@ -897,5 +904,27 @@ abstract class Living extends Entity{
 			$this->effectManager
 		);
 		parent::destroyCycles();
+	}
+
+	/**
+	 * @param Player  $player
+	 * @param Vector3 $clickPos
+	 *
+	 * @return bool
+	 */
+	public function onInteract(Player $player, Vector3 $clickPos) : bool{
+		$item = $player->getInventory()->getItemInHand();
+		if($item instanceof \pocketmine\item\Balloon && !$this instanceof Balloon) {
+			$balloon = new Balloon(Location::fromObject($player->getEyePos(), $player->getWorld(), $player->getLocation()->yaw, $player->getLocation()->pitch));
+			$balloon->spawnToAll();
+
+			$balloon->getNetworkProperties()->setGenericFlag(EntityMetadataFlags::RIDING, true);
+			$balloon->getNetworkProperties()->setVector3(EntityMetadataProperties::RIDER_SEAT_POSITION, new Vector3(mt_rand(1, 9) / 10, mt_rand(5, 15) / 10, mt_rand(1, 9) / 10), true);
+			$balloon->setRiding($this);
+
+			$this->getWorld()->broadcastPacketToViewers($this->getPosition(), SetActorLinkPacket::create(new EntityLink($this->getId(), $balloon->getId(), EntityLink::TYPE_RIDER, true, true)));
+			$item->pop();
+		}
+		return false;
 	}
 }

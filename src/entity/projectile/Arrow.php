@@ -28,6 +28,7 @@ use pocketmine\entity\animation\ArrowShakeAnimation;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Location;
+use pocketmine\event\entity\EntityArrowPunchEvent;
 use pocketmine\event\entity\EntityItemPickupEvent;
 use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\item\VanillaItems;
@@ -151,7 +152,12 @@ class Arrow extends Projectile{
 			$horizontalSpeed = sqrt($this->motion->x ** 2 + $this->motion->z ** 2);
 			if($horizontalSpeed > 0){
 				$multiplier = $this->punchKnockback * 0.6 / $horizontalSpeed;
-				$entityHit->setMotion($entityHit->getMotion()->add($this->motion->x * $multiplier, 0.1, $this->motion->z * $multiplier));
+				$ev = new EntityArrowPunchEvent($entityHit, $this, $multiplier, $entityHit->getMotion()->add($this->motion->x * $multiplier, 0.1, $this->motion->z * $multiplier));
+				$ev->call();
+
+				if(!$ev->isCancelled()) {
+					$entityHit->setMotion($ev->getMotion());
+				}
 			}
 		}
 	}
