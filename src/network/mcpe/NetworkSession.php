@@ -30,7 +30,7 @@ use pocketmine\event\player\PlayerDuplicateLoginEvent;
 use pocketmine\event\server\DataPacketDecodeEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
-use pocketmine\form\Form;
+use pocketmine\form\IForm;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\lang\Translatable;
 use pocketmine\math\Vector3;
@@ -1110,7 +1110,7 @@ class NetworkSession{
 		$this->sendDataPacket(TextPacket::tip($message));
 	}
 
-	public function onFormSent(int $id, Form $form) : bool{
+	public function onFormSent(int $id, IForm $form) : bool{
 		return $this->sendDataPacket(ModalFormRequestPacket::create($id, json_encode($form, JSON_THROW_ON_ERROR)));
 	}
 

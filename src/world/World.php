@@ -2397,6 +2397,10 @@ class World implements ChunkManager{
 		return $this->chunks[World::chunkHash($chunkX, $chunkZ)] ?? null;
 	}
 
+	public function getChunkOfLocation(Location $location): ?Chunk {
+		return $this->getChunk($location->getFloorX() >> 4, $location->getFloorZ() >> 4);
+	}
+
 	/**
 	 * @return Entity[] entity runtime ID => Entity
 	 * @phpstan-return array<int, Entity>
