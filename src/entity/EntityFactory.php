@@ -182,6 +182,9 @@ final class EntityFactory{
 		$this->register(IceBomb::class, function(World $world, CompoundTag $nbt) : IceBomb{
 			return new IceBomb(Helper::parseLocation($nbt, $world), null, $nbt);
 		}, ['IceBomb', 'minecraft:ice_bomb']);
+		$this->register(Balloon::class, function(World $world, CompoundTag $nbt) : Balloon{
+			return new Balloon(Helper::parseLocation($nbt, $world), null, $nbt);
+		}, ['Balloon', 'minecraft:balloon']);
 	}
 
 	/**
