@@ -603,10 +603,14 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::COMMANDS_WHITELIST_USAGE, []);
 	}
 
-	public static function commands_experience_usage(string $param, Translatable|string $param0) : Translatable{
-		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_USAGE, [
+	public static function commands_experience_usage() : Translatable{
+		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_USAGE, []);
+	}
+
+	public static function commands_experience_success(string $param, string $param1) : Translatable{
+		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_SUCCESS, [
 			0 => $param,
-			1 => $param0,
+			1 => $param1
 		]);
 	}
 
