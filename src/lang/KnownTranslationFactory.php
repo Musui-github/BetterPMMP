@@ -607,6 +607,10 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_USAGE, []);
 	}
 
+	public static function commands_daylock_usage() : Translatable{
+		return new Translatable(KnownTranslationKeys::COMMANDS_DAYLOCK_USAGE, []);
+	}
+
 	public static function commands_experience_success(string $param, string $param1) : Translatable{
 		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_SUCCESS, [
 			0 => $param,
@@ -1551,6 +1555,10 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_EXPERIENCE_DESCRIPTION, []);
 	}
 
+	public static function pocketmine_command_day_lock_description() : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_DAY_LOCK_DESCRIPTION, []);
+	}
+
 	public static function pocketmine_crash_archive(Translatable|string $param0, Translatable|string $param1) : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_CRASH_ARCHIVE, [
 			0 => $param0,
@@ -2073,6 +2081,10 @@ final class KnownTranslationFactory{
 
 	public static function pocketmine_permission_command_experience() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_PERMISSION_COMMAND_EXPERIENCE, []);
+	}
+
+	public static function pocketmine_permission_command_daylock() : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_DAY_LOCK_DESCRIPTION, []);
 	}
 
 	public static function pocketmine_permission_group_console() : Translatable{
