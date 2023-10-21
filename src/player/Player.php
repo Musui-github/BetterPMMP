@@ -58,6 +58,7 @@ use pocketmine\event\player\PlayerDropItemEvent;
 use pocketmine\event\player\PlayerEmoteEvent;
 use pocketmine\event\player\PlayerEntityInteractEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
+use pocketmine\event\player\PlayerExperienceChangeEvent;
 use pocketmine\event\player\PlayerGameModeChangeEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemConsumeEvent;
@@ -78,7 +79,7 @@ use pocketmine\event\player\PlayerToggleSprintEvent;
 use pocketmine\event\player\PlayerToggleSwimEvent;
 use pocketmine\event\player\PlayerTransferEvent;
 use pocketmine\event\player\PlayerViewDistanceChangeEvent;
-use pocketmine\form\Form;
+use pocketmine\form\IForm;
 use pocketmine\form\FormValidationException;
 use pocketmine\inventory\CallbackInventoryListener;
 use pocketmine\inventory\CreativeInventory;
@@ -291,7 +292,7 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 	private int $lastEmoteTick = 0;
 
 	protected int $formIdCounter = 0;
-	/** @var Form[] */
+	/** @var IForm[] */
 	protected array $forms = [];
 
 	protected \Logger $logger;
@@ -2150,11 +2151,11 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 	}
 
 	/**
-	 * Sends a Form to the player, or queue to send it if a form is already open.
+	 * Sends a IForm to the player, or queue to send it if a form is already open.
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function sendForm(Form $form) : void{
+	public function sendForm(IForm $form) : void{
 		$id = $this->formIdCounter++;
 		if($this->getNetworkSession()->onFormSent($id, $form)){
 			$this->forms[$id] = $form;

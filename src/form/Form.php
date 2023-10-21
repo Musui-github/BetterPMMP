@@ -1,42 +1,108 @@
 <?php
 
-/*
- *
- *  ____            _        _   __  __ _                  __  __ ____
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
- * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author PocketMine Team
- * @link http://www.pocketmine.net/
- *
- *
- */
-
-declare(strict_types=1);
-
 namespace pocketmine\form;
 
+use InvalidArgumentException;
 use pocketmine\player\Player;
+use WeakMap;
 
-/**
- * Form implementations must implement this interface to be able to utilize the Player form-sending mechanism.
- * There is no restriction on custom implementations other than that they must implement this.
- */
-interface Form extends \JsonSerializable{
+abstract class Form implements IForm {
+	/** @var array */
+	protected array $data = [];
+	/**
+	 * @var WeakMap<Player, ServerForm>
+	 */
+	public static WeakMap $serverForm;
+	/**
+	 * @var WeakMap<Player, int>
+	 */
+	public static WeakMap $playerFormId;
+	/** @var callable|null */
+	private $callable;
+
+	public static function setServerForm(Player $player, ServerForm $form) {
+		if (!isset(self::$serverForm)) {
+			self::$serverForm = new WeakMap();
+		}
+
+		if (isset(self::$serverForm[$player])) {
+			self::$serverForm[$player] = [];
+		}
+
+		self::$serverForm[$player] = $form;
+	}
+
+	public static function removeServerForm(Player $player, string $title): void
+	{
+		if (isset(self::$serverForm[$player])) {
+			$list = self::$serverForm[$player];
+			foreach ($list as $index => $value) {
+				if ($value->getTitle() === $title) {
+					unset(self::$serverForm[$player][$index]);
+					return;
+				}
+			}
+		}
+	}
+
+	public static function getServerFormOf(Player $player): ServerForm
+	{
+		if (!isset(self::$serverForm)) self::$serverForm = new WeakMap();
+		return self::$serverForm[$player];
+	}
+
+	public static function getIdOf(Player $player): int
+	{
+		if (!isset(self::$playerFormId)) self::$playerFormId = new WeakMap();
+		if (!isset(self::$playerFormId[$player])) self::$playerFormId[$player] = 0;
+		return self::$playerFormId[$player]++;
+	}
 
 	/**
-	 * Handles a form response from a player.
-	 *
-	 * @param mixed $data
-	 *
-	 * @throws FormValidationException if the data could not be processed
+	 * @return WeakMap
 	 */
-	public function handleResponse(Player $player, $data) : void;
+	public static function getServerForm(): WeakMap
+	{
+		return self::$serverForm;
+	}
+
+	/**
+	 * @param callable|null $callable
+	 */
+	public function __construct(?callable $callable) {
+		$this->callable = $callable;
+	}
+
+	/**
+	 * @param Player $player
+	 * @throws InvalidArgumentException
+	 * @deprecated
+	 * @see Player::sendForm()
+	 */
+	public function sendToPlayer(Player $player) : void {
+		$player->sendForm($this);
+	}
+
+	public function getCallable() : ?callable {
+		return $this->callable;
+	}
+
+	public function setCallable(?callable $callable) {
+		$this->callable = $callable;
+	}
+
+	public function handleResponse(Player $player, $data) : void {
+		$this->processData($data);
+		$callable = $this->getCallable();
+		if($callable !== null) {
+			$callable($player, $data);
+		}
+	}
+
+	public function processData(&$data) : void {
+	}
+
+	public function jsonSerialize() : array {
+		return $this->data;
+	}
 }
