@@ -36,6 +36,7 @@ use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDeathEvent;
+use pocketmine\event\entity\LivingVelocityEvent;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\CallbackInventoryListener;
 use pocketmine\inventory\Inventory;
@@ -578,7 +579,7 @@ abstract class Living extends Entity{
 		$this->broadcastAnimation(new HurtAnimation($this));
 	}
 
-	public function knockBack(Entity $entity, float $x, float $z, float $force = self::DEFAULT_KNOCKBACK_FORCE, ?float $verticalLimit = self::DEFAULT_KNOCKBACK_VERTICAL_LIMIT) : void{
+	public function knockBack(Entity $attacker, float $x, float $z, float $force = self::DEFAULT_KNOCKBACK_FORCE, ?float $verticalLimit = self::DEFAULT_KNOCKBACK_VERTICAL_LIMIT) : void{
 		$f = sqrt($x * $x + $z * $z);
 		if($f <= 0){
 			return;
@@ -598,7 +599,11 @@ abstract class Living extends Entity{
 				$motionY = $verticalLimit;
 			}
 
-			$this->setMotion(new Vector3($motionX, $motionY, $motionZ));
+			$ev = new LivingVelocityEvent($this, $attacker, new Vector3($motionX, $motionY, $motionZ), $force, $verticalLimit);
+			$ev->call();
+			if(!$ev->isCancelled()) {
+				$this->setMotion($ev->getVelocity());
+			}
 		}
 	}
 
