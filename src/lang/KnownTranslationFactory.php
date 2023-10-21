@@ -603,6 +603,13 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::COMMANDS_WHITELIST_USAGE, []);
 	}
 
+	public static function commands_experience_usage(int $param, Translatable|string $param0) : Translatable{
+		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_USAGE, [
+			0 => $param,
+			1 => $param0,
+		]);
+	}
+
 	public static function death_attack_anvil(Translatable|string $param0) : Translatable{
 		return new Translatable(KnownTranslationKeys::DEATH_ATTACK_ANVIL, [
 			0 => $param0,
@@ -1536,6 +1543,10 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_WHITELIST_DESCRIPTION, []);
 	}
 
+	public static function pocketmine_command_experience_description() : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_EXPERIENCE_DESCRIPTION, []);
+	}
+
 	public static function pocketmine_crash_archive(Translatable|string $param0, Translatable|string $param1) : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_CRASH_ARCHIVE, [
 			0 => $param0,
@@ -2054,6 +2065,10 @@ final class KnownTranslationFactory{
 
 	public static function pocketmine_permission_command_whitelist_remove() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_PERMISSION_COMMAND_WHITELIST_REMOVE, []);
+	}
+
+	public static function pocketmine_permission_command_experience() : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_PERMISSION_COMMAND_EXPERIENCE, []);
 	}
 
 	public static function pocketmine_permission_group_console() : Translatable{
