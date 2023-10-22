@@ -71,8 +71,6 @@ class Sapling extends Flowable{
 
 	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []) : bool{
 		if($item instanceof Fertilizer) {
-			$block = clone $this;
-
 			$r = $item instanceof RapidFertilizer ? 2 : mt_rand(1, 10);
 
 			if ($r == 2) {

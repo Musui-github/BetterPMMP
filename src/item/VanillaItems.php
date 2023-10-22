@@ -26,6 +26,7 @@ namespace pocketmine\item;
 use pocketmine\block\utils\RecordType;
 use pocketmine\block\VanillaBlocks as Blocks;
 use pocketmine\entity\Entity;
+use pocketmine\entity\Horse;
 use pocketmine\entity\Location;
 use pocketmine\entity\Squid;
 use pocketmine\entity\Villager;
@@ -591,14 +592,22 @@ final class VanillaItems{
 				return new Zombie(Location::fromObject($pos, $world, $yaw, $pitch));
 			}
 		});
+
 		self::register("squid_spawn_egg", new class(new IID(Ids::SQUID_SPAWN_EGG), "Squid Spawn Egg") extends SpawnEgg{
 			public function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch) : Entity{
 				return new Squid(Location::fromObject($pos, $world, $yaw, $pitch));
 			}
 		});
+
 		self::register("villager_spawn_egg", new class(new IID(Ids::VILLAGER_SPAWN_EGG), "Villager Spawn Egg") extends SpawnEgg{
 			public function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch) : Entity{
 				return new Villager(Location::fromObject($pos, $world, $yaw, $pitch));
+			}
+		});
+
+		self::register("horse_spawn_egg", new class(new IID(Ids::HORSE_SPAWN_EGG), "Horse Spawn Egg") extends SpawnEgg{
+			public function createEntity(World $world, Vector3 $pos, float $yaw, float $pitch) : Entity{
+				return new Horse(Location::fromObject($pos, $world, $yaw, $pitch));
 			}
 		});
 	}

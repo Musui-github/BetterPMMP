@@ -23,6 +23,11 @@ class Balloon extends Living
 
 	public function onUpdate(int $currentTick) : bool{
 		if(!is_null($this->riding)) {
+			if ($this->riding instanceof Balloon) {
+				$this->flagForDespawn();
+				return false;
+			}
+
 			$this->setPosition($this->riding->getPosition());
 		} else {
 			$this->flagForDespawn();

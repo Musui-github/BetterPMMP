@@ -316,6 +316,7 @@ final class ItemTypeIds{
 	public const IRON_HORSE_ARMOR = 90275;
 	public const GOLDEN_HORSE_ARMOR = 90276;
 	public const DIAMOND_HORSE_ARMOR = 90277;
+	public const HORSE_SPAWN_EGG = 90278;
 
 	private static int $nextDynamicId = self::FIRST_UNUSED_ITEM_ID;
 
