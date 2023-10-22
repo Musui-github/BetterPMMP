@@ -10,6 +10,7 @@ use pocketmine\lang\Translatable;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\gamerule\GameruleIds;
 use pocketmine\world\World;
 
 class DayLockCommand extends VanillaCommand{
@@ -31,8 +32,10 @@ class DayLockCommand extends VanillaCommand{
 			if ($state) {
 				$world->setTime(1000);
 				$world->stopTime();
+				$world->getGameruleManager()->setGamerule(GameruleIds::DO_DAYLIGHT_CYCLE, false);
 			} else {
 				$world->startTime();
+				$world->getGameruleManager()->setGamerule(GameruleIds::DO_DAYLIGHT_CYCLE, true);
 			}
 		}
 		Command::broadcastCommandMessage($sender, KnownTranslationKeys::COMMANDS_DAYLOCK_USAGE);
