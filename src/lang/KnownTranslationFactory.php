@@ -603,6 +603,10 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::COMMANDS_WHITELIST_USAGE, []);
 	}
 
+	/**
+	 * BETTER PMMP
+	 */
+
 	public static function commands_experience_usage() : Translatable{
 		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_USAGE, []);
 	}
@@ -616,6 +620,10 @@ final class KnownTranslationFactory{
 			0 => $param,
 			1 => $param1
 		]);
+	}
+
+	public static function commands_scoreboard_usage() : Translatable{
+		return new Translatable(KnownTranslationKeys::COMMANDS_SCOREBOARD_USAGE, []);
 	}
 
 	public static function death_attack_anvil(Translatable|string $param0) : Translatable{
@@ -1551,12 +1559,20 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_WHITELIST_DESCRIPTION, []);
 	}
 
+	/**
+	 * BETTER PMMP
+	 */
+
 	public static function pocketmine_command_experience_description() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_EXPERIENCE_DESCRIPTION, []);
 	}
 
 	public static function pocketmine_command_day_lock_description() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_DAY_LOCK_DESCRIPTION, []);
+	}
+
+	public static function pocketmine_command_scoreboard_description() : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_SCOREBOARD_DESCRIPTION, []);
 	}
 
 	public static function pocketmine_crash_archive(Translatable|string $param0, Translatable|string $param1) : Translatable{
