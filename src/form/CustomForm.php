@@ -4,7 +4,7 @@ namespace pocketmine\form;
 
 use pocketmine\network\PacketHandlingException;
 
-class CustomForm extends Form{
+class CustomForm extends Form {
 	private array $labelMap = [];
 	private array $validationMethods = [];
 
