@@ -9,6 +9,7 @@ use pocketmine\lang\KnownTranslationKeys;
 use pocketmine\lang\Translatable;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
 
 class DayLockCommand extends VanillaCommand{
