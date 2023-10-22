@@ -21,13 +21,11 @@ class DayLockCommand extends VanillaCommand{
 		$this->setPermission(DefaultPermissionNames::COMMAND_DAYLOCK);
 	}
 
-	public function execute(CommandSender $sender, string $commandLabel, array $args){
+	public function execute(CommandSender $sender, string $commandLabel, array $args) : void{
 		/** @var World[] $worlds */
 		$worlds = $sender instanceof Player ? [$sender->getWorld()] : $sender->getServer()->getWorldManager()->getWorlds();
 
-		$state = false;
 		count($args) == 0 ? $state = true : $state = $args[0];
-
 		foreach($worlds as $world){
 			if ($state) {
 				$world->setTime(1000);

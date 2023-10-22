@@ -66,6 +66,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\convert\TypeConverter;
@@ -87,11 +88,13 @@ use pocketmine\world\biome\Biome;
 use pocketmine\world\biome\BiomeRegistry;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\format\io\ChunkData;
+use pocketmine\world\format\io\data\BaseNbtWorldData;
 use pocketmine\world\format\io\exception\CorruptedChunkException;
 use pocketmine\world\format\io\GlobalBlockStateHandlers;
 use pocketmine\world\format\io\WritableWorldProvider;
 use pocketmine\world\format\LightArray;
 use pocketmine\world\format\SubChunk;
+use pocketmine\world\gamerule\GameruleManager;
 use pocketmine\world\generator\GeneratorManager;
 use pocketmine\world\generator\GeneratorRegisterTask;
 use pocketmine\world\generator\GeneratorUnregisterTask;
@@ -369,6 +372,7 @@ class World implements ChunkManager{
 	private ?SkyLightUpdate $skyLightUpdate = null;
 
 	private \Logger $logger;
+	protected GameruleManager $gameruleManager;
 
 	/**
 	 * @phpstan-return ChunkPosHash
@@ -513,6 +517,13 @@ class World implements ChunkManager{
 
 		$this->time = $this->provider->getWorldData()->getTime();
 
+		$worldData = $this->provider->getWorldData();
+		if(!$worldData instanceof BaseNbtWorldData) {
+			throw new \Error("Unknown worldData");
+		}
+
+		$this->gameruleManager = new GameruleManager($this, $worldData->getCompoundTag()->getCompoundTag("gamerules") ?? new CompoundTag());
+
 		$cfg = $this->server->getConfigGroup();
 		$this->chunkTickRadius = min($this->server->getViewDistance(), max(0, $cfg->getPropertyInt(YmlServerProperties::CHUNK_TICKING_TICK_RADIUS, 4)));
 		if($cfg->getPropertyInt("chunk-ticking.per-tick", 40) <= 0){
@@ -575,6 +586,13 @@ class World implements ChunkManager{
 
 	public function getTickRateTime() : float{
 		return $this->tickRateTime;
+	}
+
+	/**
+	 * @return GameruleManager
+	 */
+	public function getGameruleManager() : GameruleManager{
+		return $this->gameruleManager;
 	}
 
 	public function registerGeneratorToWorker(int $worker) : void{
@@ -2630,6 +2648,7 @@ class World implements ChunkManager{
 
 		if($entity instanceof Player){
 			$this->players[$entity->getId()] = $entity;
+			$this->getGameruleManager()->syncGamerules($entity);
 		}
 		$this->entities[$entity->getId()] = $entity;
 	}
