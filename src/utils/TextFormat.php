@@ -64,6 +64,19 @@ abstract class TextFormat{
 	public const WHITE = TextFormat::ESCAPE . "f";
 	public const MINECOIN_GOLD = TextFormat::ESCAPE . "g";
 
+	/** BETTER PMMP */
+
+	public const LAPIS_LAZULI = TextFormat::ESCAPE . "t";
+	public const REDSTONE = TextFormat::ESCAPE . "m";
+	public const COPPER = TextFormat::ESCAPE . "n";
+	public const AMETHYST = TextFormat::ESCAPE . "u";
+	public const EMERALD = TextFormat::ESCAPE . "q";
+	public const QUARTZ = TextFormat::ESCAPE . "h";
+	public const IRON = TextFormat::ESCAPE . "i";
+	public const NETHERITE = TextFormat::ESCAPE . "j";
+	public const GOLD_MATERIAL = TextFormat::ESCAPE . "p";
+	public const DIAMOND = TextFormat::ESCAPE . "s";
+
 	public const COLORS = [
 		self::BLACK => self::BLACK,
 		self::DARK_BLUE => self::DARK_BLUE,
@@ -82,12 +95,24 @@ abstract class TextFormat{
 		self::YELLOW => self::YELLOW,
 		self::WHITE => self::WHITE,
 		self::MINECOIN_GOLD => self::MINECOIN_GOLD,
+
+		/** BETTER PMMP */
+		self::LAPIS_LAZULI => self::LAPIS_LAZULI,
+		self::REDSTONE => self::REDSTONE,
+		self::COPPER => self::COPPER,
+		self::AMETHYST => self::AMETHYST,
+		self::EMERALD => self::EMERALD,
+		self::QUARTZ => self::QUARTZ,
+		self::IRON => self::IRON,
+		self::NETHERITE => self::NETHERITE,
+		self::GOLD_MATERIAL => self::GOLD_MATERIAL,
+		self::DIAMOND => self::DIAMOND,
 	];
 
 	public const OBFUSCATED = TextFormat::ESCAPE . "k";
 	public const BOLD = TextFormat::ESCAPE . "l";
 	public const STRIKETHROUGH = TextFormat::ESCAPE . "m";
-	public const UNDERLINE = TextFormat::ESCAPE . "n";
+	public const UNDERLINE = TextFormat::ESCAPE . "z";
 	public const ITALIC = TextFormat::ESCAPE . "o";
 
 	public const FORMATS = [
@@ -130,7 +155,7 @@ abstract class TextFormat{
 	 * @return string[]
 	 */
 	public static function tokenize(string $string) : array{
-		$result = preg_split("/(" . TextFormat::ESCAPE . "[0-9a-gk-or])/u", $string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+		$result = preg_split("/(" . TextFormat::ESCAPE . "[0-9a-z])/u", $string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 		if($result === false) throw self::makePcreError();
 		return $result;
 	}
@@ -144,7 +169,7 @@ abstract class TextFormat{
 		$string = mb_scrub($string, 'UTF-8');
 		$string = self::preg_replace("/[\x{E000}-\x{F8FF}]/u", "", $string); //remove unicode private-use-area characters (they might break the console)
 		if($removeFormat){
-			$string = str_replace(TextFormat::ESCAPE, "", self::preg_replace("/" . TextFormat::ESCAPE . "[0-9a-gk-or]/u", "", $string));
+			$string = str_replace(TextFormat::ESCAPE, "", self::preg_replace("/" . TextFormat::ESCAPE . "[0-9a-z]/u", "", $string));
 		}
 		return str_replace("\x1b", "", self::preg_replace("/\x1b[\\(\\][[0-9;\\[\\(]+[Bm]/u", "", $string));
 	}
@@ -155,7 +180,7 @@ abstract class TextFormat{
 	 * @param string $placeholder default "&"
 	 */
 	public static function colorize(string $string, string $placeholder = "&") : string{
-		return self::preg_replace('/' . preg_quote($placeholder, "/") . '([0-9a-gk-or])/u', TextFormat::ESCAPE . '$1', $string);
+		return self::preg_replace('/' . preg_quote($placeholder, "/") . '([0-9a-z])/u', TextFormat::ESCAPE . '$1', $string);
 	}
 
 	/**
