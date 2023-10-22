@@ -323,6 +323,7 @@ use pocketmine\world\World;
  * @method static HorseArmor IRON_HORSE_ARMOR()
  * @method static HorseArmor GOLDEN_HORSE_ARMOR()
  * @method static HorseArmor DIAMOND_HORSE_ARMOR()
+ * @method static SpawnEgg HORSE_SPAWN_EGG()
  */
 final class VanillaItems{
 	use CloningRegistryTrait;

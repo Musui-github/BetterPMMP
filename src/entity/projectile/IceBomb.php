@@ -36,13 +36,18 @@ class IceBomb extends Throwable{
 
 	protected function onHit(ProjectileHitEvent $event) : void{
 		for($i = 0; $i < 6; ++$i){
-			$this->getWorld()->addParticle($this->location, new WaterParticle());
+			$this->getWorld()->addParticle($this->location->add(0, 0.8, 0), new WaterParticle());
 		}
 	}
 
 	public function onUpdate(int $currentTick) : bool{
 		$position = $this->getPosition();
-		if(!($world = $this->getWorld())->getBlock($position) instanceof Air) {
+
+		$target = ($world = $this->getWorld())->getBlock($position);
+
+		if ($target instanceof Air) $target = $world->getBlock($position->add(0, -1, 0));
+
+		if(!$target instanceof Air) {
 			$radiusX = mt_rand(1, 2);
 			$radiusZ = mt_rand(1, 2);
 			for ($x = -$radiusX; $x <= $radiusX; $x++) {

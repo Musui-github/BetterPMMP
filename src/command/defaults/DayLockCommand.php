@@ -9,6 +9,7 @@ use pocketmine\lang\KnownTranslationKeys;
 use pocketmine\lang\Translatable;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
 
 class DayLockCommand extends VanillaCommand{
@@ -25,7 +26,6 @@ class DayLockCommand extends VanillaCommand{
 		/** @var World[] $worlds */
 		$worlds = $sender instanceof Player ? [$sender->getWorld()] : $sender->getServer()->getWorldManager()->getWorlds();
 
-		$state = false;
 		count($args) == 0 ? $state = true : $state = $args[0];
 
 		foreach($worlds as $world){
