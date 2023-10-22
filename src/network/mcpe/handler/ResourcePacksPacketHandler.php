@@ -32,12 +32,17 @@ use pocketmine\network\mcpe\protocol\ResourcePackClientResponsePacket;
 use pocketmine\network\mcpe\protocol\ResourcePackDataInfoPacket;
 use pocketmine\network\mcpe\protocol\ResourcePacksInfoPacket;
 use pocketmine\network\mcpe\protocol\ResourcePackStackPacket;
+use pocketmine\network\mcpe\protocol\TransferPacket;
 use pocketmine\network\mcpe\protocol\types\Experiments;
 use pocketmine\network\mcpe\protocol\types\resourcepacks\ResourcePackInfoEntry;
 use pocketmine\network\mcpe\protocol\types\resourcepacks\ResourcePackStackEntry;
 use pocketmine\network\mcpe\protocol\types\resourcepacks\ResourcePackType;
 use pocketmine\resourcepacks\ResourcePack;
 use pocketmine\resourcepacks\ResourcePackManager;
+use pocketmine\resourcepacks\UrlResourcePack;
+use pocketmine\scheduler\ClosureTask;
+use pocketmine\Server;
+use pocketmine\ServerProperties;
 use function array_map;
 use function ceil;
 use function count;
@@ -54,6 +59,7 @@ class ResourcePacksPacketHandler extends PacketHandler{
 
 	/** @var bool[][] uuid => [chunk index => hasSent] */
 	private array $downloadedChunks = [];
+	protected array $cndUrls = [];
 
 	/**
 	 * @phpstan-param \Closure() : void $completionCallback
@@ -69,6 +75,10 @@ class ResourcePacksPacketHandler extends PacketHandler{
 			//TODO: more stuff
 			$encryptionKey = $this->resourcePackManager->getPackEncryptionKey($pack->getPackId());
 
+			if($pack instanceof UrlResourcePack) {
+				$this->cndUrls["{$pack->getPackId()}_{$pack->getPackVersion()}"] = $pack->getUrl();
+			}
+
 			return new ResourcePackInfoEntry(
 				$pack->getPackId(),
 				$pack->getPackVersion(),
@@ -80,7 +90,14 @@ class ResourcePacksPacketHandler extends PacketHandler{
 			);
 		}, $this->resourcePackManager->getResourceStack());
 		//TODO: support forcing server packs
-		$this->session->sendDataPacket(ResourcePacksInfoPacket::create($resourcePackEntries, [], $this->resourcePackManager->resourcePacksRequired(), false, $this->resourcePackManager->resourcePacksRequired(), []));
+
+		$this->session->sendDataPacket(ResourcePacksInfoPacket::create($resourcePackEntries, [], $this->resourcePackManager->resourcePacksRequired(), false, $this->resourcePackManager->resourcePacksRequired(), $this->cndUrls));
+		if(Server::getInstance()->getConfigGroup()->getConfigBool(ServerProperties::FAST_CONNECT, false) && count($resourcePackEntries) <= 0) {
+			($this->completionCallback)();
+			$this->session->getLogger()->debug("Directly login");
+			return;
+		}
+
 		$this->session->getLogger()->debug("Waiting for client to accept resource packs");
 	}
 
@@ -107,6 +124,10 @@ class ResourcePacksPacketHandler extends PacketHandler{
 					if(!($pack instanceof ResourcePack)){
 						//Client requested a resource pack but we don't have it available on the server
 						$this->disconnectWithError("Unknown pack $uuid requested, available packs: " . implode(", ", $this->resourcePackManager->getPackIdList()));
+						return false;
+					}
+
+					if($pack instanceof UrlResourcePack) {
 						return false;
 					}
 

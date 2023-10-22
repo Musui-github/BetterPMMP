@@ -55,4 +55,5 @@ final class ServerProperties{
 	public const VIEW_DISTANCE = "view-distance";
 	public const WHITELIST = "white-list";
 	public const XBOX_AUTH = "xbox-auth";
+	public const FAST_CONNECT = "fast_connect";
 }

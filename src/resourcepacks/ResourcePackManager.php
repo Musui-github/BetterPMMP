@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\resourcepacks;
 
+use mysql_xdevapi\Exception;
 use pocketmine\utils\Config;
 use pocketmine\utils\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -81,6 +82,23 @@ class ResourcePackManager{
 		$this->serverForceResources = (bool) $resourcePacksConfig->get("force_resources", false);
 
 		$logger->info("Loading resource packs...");
+
+		$resourceStackURL = $resourcePacksConfig->get("resource_stack_urls", []);
+		if(!is_array($resourceStackURL)){
+			throw new \InvalidArgumentException("\"resource_stack_urls\" key should contain a list of pack names");
+		}
+		foreach($resourceStackURL as $pos => $item) {
+			foreach($item as $pack) {
+				$newPack = new UrlResourcePack($pack["name"], $pack["id"], $pack["version"], $pack["url"], $pack["key"] ?? ""); // Too fast download
+
+				$this->resourcePacks[] = $newPack;
+				$index = strtolower($newPack->getPackId());
+				$this->uuidList[$index] = $newPack;
+				if($newPack->getEncryptionKey() !== "") {
+					$this->encryptionKeys[$index] = $newPack->getEncryptionKey();
+				}
+			}
+		}
 
 		$resourceStack = $resourcePacksConfig->get("resource_stack", []);
 		if(!is_array($resourceStack)){

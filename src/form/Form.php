@@ -45,10 +45,10 @@ abstract class Form implements IForm {
 		}
 	}
 
-	public static function getServerFormOf(Player $player): ServerForm
+	public static function getServerFormOf(Player $player): ?ServerForm
 	{
 		if (!isset(self::$serverForm)) self::$serverForm = new WeakMap();
-		return self::$serverForm[$player];
+		return self::$serverForm[$player] ?? null;
 	}
 
 	public static function getIdOf(Player $player): int

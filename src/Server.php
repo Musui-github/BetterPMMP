@@ -788,7 +788,10 @@ class Server{
 
 		Timings::init();
 		$this->tickSleeper = new TimeTrackingSleeperHandler(Timings::$serverInterrupts);
+
 		$this->taskScheduler = new TaskScheduler("Server");
+		$this->taskScheduler->setEnabled(true);
+
 		$this->signalHandler = new SignalHandler(function() : void{
 			$this->logger->info("Received signal interrupt, stopping the server");
 			$this->shutdown();
@@ -841,7 +844,8 @@ class Server{
 					ServerProperties::AUTO_SAVE => true,
 					ServerProperties::VIEW_DISTANCE => self::DEFAULT_MAX_VIEW_DISTANCE,
 					ServerProperties::XBOX_AUTH => true,
-					ServerProperties::LANGUAGE => "eng"
+					ServerProperties::LANGUAGE => "eng",
+					ServerProperties::FAST_CONNECT => false,
 				])
 			);
 

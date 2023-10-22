@@ -118,6 +118,13 @@ class TaskScheduler{
 		$this->cancelAllTasks();
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function isEnabled() : bool{
+		return $this->enabled;
+	}
+
 	public function setEnabled(bool $enabled) : void{
 		$this->enabled = $enabled;
 	}

@@ -523,6 +523,10 @@ class PluginManager{
 	}
 
 	public function tickSchedulers(int $currentTick) : void{
+		if(($scheduler = Server::getInstance()->getScheduler())->isEnabled()) {
+			$scheduler->mainThreadHeartbeat($currentTick);
+		}
+
 		foreach($this->enabledPlugins as $pluginName => $p){
 			if(isset($this->enabledPlugins[$pluginName])){
 				//the plugin may have been disabled as a result of updating other plugins' schedulers, and therefore

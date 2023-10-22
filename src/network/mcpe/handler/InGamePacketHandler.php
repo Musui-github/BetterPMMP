@@ -36,6 +36,7 @@ use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\event\player\PlayerEditBookEvent;
 use pocketmine\form\Form;
+use pocketmine\form\ServerForm;
 use pocketmine\inventory\transaction\action\DropItemAction;
 use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\inventory\transaction\TransactionBuilder;
@@ -1039,10 +1040,12 @@ class InGamePacketHandler extends PacketHandler{
 		$player = $this->player;
 		Server::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($player, $packet) {
 			$form = Form::getServerFormOf($player);
-			$response = new ServerSettingsResponsePacket();
-			$response->formId = Form::getIdOf($player);
-			$response->formData = json_encode($form->jsonSerialize());
-			$player->getNetworkSession()->sendDataPacket($response);
+			if($form instanceof ServerForm) {
+				$response = new ServerSettingsResponsePacket();
+				$response->formId = Form::getIdOf($player);
+				$response->formData = json_encode($form->jsonSerialize());
+				$player->getNetworkSession()->sendDataPacket($response);
+			}
 		}), 20);
 		return true;
 	}

@@ -2,8 +2,15 @@
 
 #Choose whether players must use your chosen resource packs to join the server.
 #NOTE: This will do nothing if there are no resource packs in the stack below.
+resource_stack_urls:
+#    - Pack1:
+#        name: "Bloodthirst" // EXEMPLE
+#        id: "2e36a581-2574-467a-9ac0-a6b8622ab43c"
+#        version: "1.0.0"
+#        url: "https://cdn.discordapp.com/attachments/1149934436759117874/1165681364398522368/Bloodthirst16x_1.0.zip"
 force_resources: false
 resource_stack:
+
   #Resource packs here are applied from bottom to top. This means that resources in higher packs will override those in lower packs.
   #Entries here must indicate the filename of the resource pack.
   #Example
