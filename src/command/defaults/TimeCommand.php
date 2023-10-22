@@ -29,6 +29,7 @@ use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
+use pocketmine\world\gamerule\GameruleIds;
 use pocketmine\world\World;
 use function count;
 
@@ -60,6 +61,7 @@ class TimeCommand extends VanillaCommand{
 			}
 			foreach($sender->getServer()->getWorldManager()->getWorlds() as $world){
 				$world->startTime();
+				$world->getGameruleManager()->setGamerule(GameruleIds::DO_DAYLIGHT_CYCLE, true);
 			}
 			Command::broadcastCommandMessage($sender, "Restarted the time");
 			return true;
@@ -69,6 +71,7 @@ class TimeCommand extends VanillaCommand{
 			}
 			foreach($sender->getServer()->getWorldManager()->getWorlds() as $world){
 				$world->stopTime();
+				$world->getGameruleManager()->setGamerule(GameruleIds::DO_DAYLIGHT_CYCLE, false);
 			}
 			Command::broadcastCommandMessage($sender, "Stopped the time");
 			return true;
@@ -120,6 +123,7 @@ class TimeCommand extends VanillaCommand{
 
 			foreach($sender->getServer()->getWorldManager()->getWorlds() as $world){
 				$world->setTime($value);
+				$world->getGameruleManager()->setGamerule(GameruleIds::DO_DAYLIGHT_CYCLE, true);
 			}
 			Command::broadcastCommandMessage($sender, KnownTranslationFactory::commands_time_set((string) $value));
 		}elseif($args[0] === "add"){
