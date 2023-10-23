@@ -67,7 +67,7 @@ class GameruleCommand extends VanillaCommand{
 		}
 
 		$world->getGameruleManager()->setGamerule($ruleName, ($gameruleValue = match (GameruleIds::getType($ruleName)) {
-			GameruleIds::TYPE_BOOL => boolval($args[1]),
+			GameruleIds::TYPE_BOOL => GameruleIds::boolVal($args[1]),
 			GameruleIds::TYPE_INT => intval($args[1]),
 		}));
 		$sender->sendMessage(KnownTranslationFactory::pocketmine_command_gamerule_success($ruleName, "{$gameruleValue}"));
