@@ -28,7 +28,6 @@ use pocketmine\block\VanillaBlocks;
 use pocketmine\block\Water;
 use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
-use pocketmine\world\particle\SnowballPoofParticle;
 use pocketmine\world\particle\WaterParticle;
 
 class IceBomb extends Throwable{

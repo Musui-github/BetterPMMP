@@ -5,12 +5,10 @@ namespace pocketmine\world\gamerule;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\network\mcpe\protocol\types\BoolGameRule;
 use pocketmine\network\mcpe\protocol\types\IntGameRule;
 use pocketmine\player\Player;
-use pocketmine\Server;
 use pocketmine\world\World;
 
 class GameruleManager

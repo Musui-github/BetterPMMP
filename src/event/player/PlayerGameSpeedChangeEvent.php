@@ -25,7 +25,6 @@ namespace pocketmine\event\player;
 
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
-use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 
 /**

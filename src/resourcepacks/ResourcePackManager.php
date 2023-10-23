@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace pocketmine\resourcepacks;
 
-use mysql_xdevapi\Exception;
 use pocketmine\utils\Config;
 use pocketmine\utils\Filesystem;
 use Symfony\Component\Filesystem\Path;

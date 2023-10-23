@@ -26,20 +26,11 @@ namespace pocketmine\command\defaults;
 use pocketmine\command\CommandSender;
 use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\lang\KnownTranslationFactory;
-use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\permission\DefaultPermissionNames;
 use pocketmine\player\Player;
-use pocketmine\plugin\Plugin;
-use pocketmine\utils\TextFormat;
-use pocketmine\utils\Utils;
-use pocketmine\VersionInfo;
 use pocketmine\world\gamerule\GameruleIds;
 use function count;
-use function implode;
-use function sprintf;
-use function stripos;
 use function strtolower;
-use const PHP_VERSION;
 
 class GameruleCommand extends VanillaCommand{
 

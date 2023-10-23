@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace pocketmine\form;
 
-use pocketmine\form\FormValidationException;
-
 class SimpleForm extends Form {
 
     const IMAGE_TYPE_PATH = 0;
