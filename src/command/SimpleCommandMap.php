@@ -36,6 +36,7 @@ use pocketmine\command\defaults\EffectCommand;
 use pocketmine\command\defaults\EnchantCommand;
 use pocketmine\command\defaults\ExperienceCommand;
 use pocketmine\command\defaults\GamemodeCommand;
+use pocketmine\command\defaults\GameruleCommand;
 use pocketmine\command\defaults\GarbageCollectorCommand;
 use pocketmine\command\defaults\GiveCommand;
 use pocketmine\command\defaults\HelpCommand;
@@ -134,6 +135,7 @@ class SimpleCommandMap implements CommandMap{
 			/** BETTER PMMP */
 			new ExperienceCommand(),
 			new DayLockCommand(),
+			new GameruleCommand(),
 		]);
 	}
 

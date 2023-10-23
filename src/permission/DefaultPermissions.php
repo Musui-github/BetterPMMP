@@ -114,5 +114,6 @@ abstract class DefaultPermissions{
 		self::registerPermission(new Permission(Names::COMMAND_WHITELIST_REMOVE, l10n::pocketmine_permission_command_whitelist_remove()), [$operatorRoot]);
 		self::registerPermission(new Permission(Names::COMMAND_EXPERIENCE, l10n::pocketmine_permission_command_experience()), [$operatorRoot]);
 		self::registerPermission(new Permission(Names::COMMAND_DAYLOCK, l10n::pocketmine_permission_command_daylock()), [$operatorRoot]);
+		self::registerPermission(new Permission(Names::COMMAND_GAMERULE, l10n::pocketmine_permission_command_daylock()), [$operatorRoot]);
 	}
 }

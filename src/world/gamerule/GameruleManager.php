@@ -39,10 +39,15 @@ class GameruleManager
 	/**
 	 * @param string $id
 	 *
-	 * @return int|null
+	 * @return bool|int|null
 	 */
-	public function getGamerule(string $id) : ?int{
-		return $this->tag->getByte($id) ?? null;
+	public function getGamerule(string $id) : bool|int|null{
+		$tag = $this->tag->getTag($id);
+		if($tag instanceof ByteTag) {
+			return boolval($tag->getValue());
+		} elseif($tag instanceof IntTag) {
+			return intval($tag->getValue());
+		} else return null;
 	}
 
 	/**

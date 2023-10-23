@@ -141,6 +141,7 @@ final class KnownTranslationKeys{
 	public const COMMANDS_EXPERIENCE_SUCCESS = "commands.experience.success";
 	public const COMMANDS_EXPERIENCE_FAILED = "commands.experience.failed";
 	public const COMMANDS_DAYLOCK_USAGE = "commands.daylock.usage";
+	public const COMMANDS_GAMERULE_USAGE = "commands.gamerule.usage";
 	public const DEATH_ATTACK_ANVIL = "death.attack.anvil";
 	public const DEATH_ATTACK_ARROW = "death.attack.arrow";
 	public const DEATH_ATTACK_ARROW_ITEM = "death.attack.arrow.item";
@@ -342,6 +343,9 @@ final class KnownTranslationKeys{
 	public const POCKETMINE_COMMAND_WHITELIST_DESCRIPTION = "pocketmine.command.whitelist.description";
 	public const POCKETMINE_COMMAND_EXPERIENCE_DESCRIPTION = "pocketmine.command.experience.description";
 	public const POCKETMINE_COMMAND_DAY_LOCK_DESCRIPTION = "pocketmine.command.daylock.description";
+	public const POCKETMINE_COMMAND_GAMERULE_DESCRIPTION = "pocketmine.command.gamerule.description";
+	public const POCKETMINE_COMMAND_GAMERULE_INVALID = "pocketmine.command.gamerule.invalid";
+	public const POCKETMINE_COMMAND_GAMERULE_SUCCESS = "pocketmine.command.gamerule.success";
 	public const POCKETMINE_CRASH_ARCHIVE = "pocketmine.crash.archive";
 	public const POCKETMINE_CRASH_CREATE = "pocketmine.crash.create";
 	public const POCKETMINE_CRASH_ERROR = "pocketmine.crash.error";

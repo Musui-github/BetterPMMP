@@ -611,6 +611,10 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::COMMANDS_DAYLOCK_USAGE, []);
 	}
 
+	public static function command_gamerule_usage() : Translatable{
+		return new Translatable(KnownTranslationKeys::COMMANDS_GAMERULE_USAGE, []);
+	}
+
 	public static function commands_experience_success(string $param, string $param1) : Translatable{
 		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_SUCCESS, [
 			0 => $param,
@@ -1559,6 +1563,23 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_DAY_LOCK_DESCRIPTION, []);
 	}
 
+	public static function pocketmine_command_gamerule_description() : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_GAMERULE_DESCRIPTION, []);
+	}
+
+	public static function pocketmine_command_gamerule_invalid(Translatable|string $param0) : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_GAMERULE_INVALID, [
+			0 => $param0
+		]);
+	}
+
+	public static function pocketmine_command_gamerule_success(Translatable|string $param0, Translatable|string $param1) : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_GAMERULE_SUCCESS, [
+			0 => $param0,
+			1 => $param1
+		]);
+	}
+
 	public static function pocketmine_crash_archive(Translatable|string $param0, Translatable|string $param1) : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_CRASH_ARCHIVE, [
 			0 => $param0,
@@ -2085,6 +2106,10 @@ final class KnownTranslationFactory{
 
 	public static function pocketmine_permission_command_daylock() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_DAY_LOCK_DESCRIPTION, []);
+	}
+
+	public static function pocketmine_permission_command_gamerule() : Translatable{
+		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_GAMERULE_DESCRIPTION, []);
 	}
 
 	public static function pocketmine_permission_group_console() : Translatable{
@@ -2706,5 +2731,4 @@ final class KnownTranslationFactory{
 			0 => $param0,
 		]);
 	}
-
 }
