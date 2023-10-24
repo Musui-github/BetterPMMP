@@ -622,10 +622,6 @@ final class KnownTranslationFactory{
 		]);
 	}
 
-	public static function commands_scoreboard_usage() : Translatable{
-		return new Translatable(KnownTranslationKeys::COMMANDS_SCOREBOARD_USAGE, []);
-	}
-
 	public static function death_attack_anvil(Translatable|string $param0) : Translatable{
 		return new Translatable(KnownTranslationKeys::DEATH_ATTACK_ANVIL, [
 			0 => $param0,
@@ -1569,10 +1565,6 @@ final class KnownTranslationFactory{
 
 	public static function pocketmine_command_day_lock_description() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_DAY_LOCK_DESCRIPTION, []);
-	}
-
-	public static function pocketmine_command_scoreboard_description() : Translatable{
-		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_SCOREBOARD_DESCRIPTION, []);
 	}
 
 	public static function pocketmine_crash_archive(Translatable|string $param0, Translatable|string $param1) : Translatable{
