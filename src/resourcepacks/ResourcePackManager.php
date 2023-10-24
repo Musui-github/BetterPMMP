@@ -82,6 +82,23 @@ class ResourcePackManager{
 
 		$logger->info("Loading resource packs...");
 
+		$resourceStackURL = $resourcePacksConfig->get("resource_stack_urls", []);
+		if(!is_array($resourceStackURL)){
+			throw new \InvalidArgumentException("\"resource_stack_urls\" key should contain a list of pack names");
+		}
+		foreach($resourceStackURL as $pos => $item) {
+			foreach($item as $pack) {
+				$newPack = new UrlResourcePack($pack["name"], $pack["id"], $pack["version"], $pack["url"], $pack["key"] ?? ""); // Too fast download
+
+				$this->resourcePacks[] = $newPack;
+				$index = strtolower($newPack->getPackId());
+				$this->uuidList[$index] = $newPack;
+				if($newPack->getEncryptionKey() !== "") {
+					$this->encryptionKeys[$index] = $newPack->getEncryptionKey();
+				}
+			}
+		}
+
 		$resourceStack = $resourcePacksConfig->get("resource_stack", []);
 		if(!is_array($resourceStack)){
 			throw new \InvalidArgumentException("\"resource_stack\" key should contain a list of pack names");

@@ -25,7 +25,6 @@ namespace pocketmine\block\inventory;
 
 use pocketmine\block\tile\EnderChest;
 use pocketmine\inventory\DelegateInventory;
-use pocketmine\inventory\Inventory;
 use pocketmine\inventory\PlayerEnderInventory;
 use pocketmine\network\mcpe\protocol\BlockEventPacket;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;

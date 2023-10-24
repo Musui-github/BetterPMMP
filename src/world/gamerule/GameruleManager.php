@@ -5,12 +5,10 @@ namespace pocketmine\world\gamerule;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
 use pocketmine\network\mcpe\protocol\types\BoolGameRule;
 use pocketmine\network\mcpe\protocol\types\IntGameRule;
 use pocketmine\player\Player;
-use pocketmine\Server;
 use pocketmine\world\World;
 
 class GameruleManager
@@ -39,10 +37,15 @@ class GameruleManager
 	/**
 	 * @param string $id
 	 *
-	 * @return int|null
+	 * @return bool|int|null
 	 */
-	public function getGamerule(string $id) : ?int{
-		return $this->tag->getByte($id) ?? null;
+	public function getGamerule(string $id) : bool|int|null{
+		$tag = $this->tag->getTag($id);
+		if($tag instanceof ByteTag) {
+			return boolval($tag->getValue());
+		} elseif($tag instanceof IntTag) {
+			return intval($tag->getValue());
+		} else return null;
 	}
 
 	/**

@@ -29,13 +29,13 @@ use pocketmine\block\Lectern;
 use pocketmine\block\tile\Sign;
 use pocketmine\block\utils\SignText;
 use pocketmine\block\VanillaBlocks;
-use pocketmine\data\java\GameModeIdMap;
 use pocketmine\entity\animation\ConsumingItemAnimation;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\entity\InvalidSkinException;
 use pocketmine\event\player\PlayerEditBookEvent;
 use pocketmine\form\Form;
+use pocketmine\form\ServerForm;
 use pocketmine\inventory\transaction\action\DropItemAction;
 use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\inventory\transaction\TransactionBuilder;
@@ -84,6 +84,7 @@ use pocketmine\network\mcpe\protocol\PlayerHotbarPacket;
 use pocketmine\network\mcpe\protocol\PlayerInputPacket;
 use pocketmine\network\mcpe\protocol\PlayerSkinPacket;
 use pocketmine\network\mcpe\protocol\RequestChunkRadiusPacket;
+use pocketmine\network\mcpe\protocol\RequestPermissionsPacket;
 use pocketmine\network\mcpe\protocol\ServerSettingsRequestPacket;
 use pocketmine\network\mcpe\protocol\ServerSettingsResponsePacket;
 use pocketmine\network\mcpe\protocol\SetActorMotionPacket;
@@ -1039,10 +1040,12 @@ class InGamePacketHandler extends PacketHandler{
 		$player = $this->player;
 		Server::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($player, $packet) {
 			$form = Form::getServerFormOf($player);
-			$response = new ServerSettingsResponsePacket();
-			$response->formId = Form::getIdOf($player);
-			$response->formData = json_encode($form->jsonSerialize());
-			$player->getNetworkSession()->sendDataPacket($response);
+			if($form instanceof ServerForm) {
+				$response = new ServerSettingsResponsePacket();
+				$response->formId = Form::getIdOf($player);
+				$response->formData = json_encode($form->jsonSerialize());
+				$player->getNetworkSession()->sendDataPacket($response);
+			}
 		}), 20);
 		return true;
 	}
@@ -1123,5 +1126,21 @@ class InGamePacketHandler extends PacketHandler{
 
 		$player->chat($packet->getCommand());
 		return true;
+	}
+
+	public function handleRequestPermissions(RequestPermissionsPacket $packet) : bool{
+		$player = $this->player;
+		if(!$player->getServer()->isOp($player->getName())) {
+			return false;
+		}
+
+		$target = $player->getServer()->getWorldManager()->findEntity($packet->getTargetActorUniqueId());
+		if(!$target instanceof Player) {
+			return false;
+		}
+
+		// TODO SOON :)
+
+		return false;
 	}
 }

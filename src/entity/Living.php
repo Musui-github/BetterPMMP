@@ -39,7 +39,6 @@ use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\entity\LivingVelocityEvent;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\CallbackInventoryListener;
-use pocketmine\inventory\Inventory;
 use pocketmine\item\Armor;
 use pocketmine\item\Durable;
 use pocketmine\item\enchantment\Enchantment;

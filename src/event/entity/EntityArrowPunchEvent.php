@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace pocketmine\event\entity;
 
-use pocketmine\block\Block;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Arrow;
 use pocketmine\event\Cancellable;

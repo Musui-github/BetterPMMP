@@ -4,7 +4,6 @@ namespace pocketmine\command\arguments\list;
 
 use pocketmine\command\arguments\CommandArgument;
 use pocketmine\command\CommandSender;
-use pocketmine\data\bedrock\item\BlockItemIdMap;
 use pocketmine\item\StringToItemParser;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 
