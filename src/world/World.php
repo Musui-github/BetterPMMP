@@ -1436,7 +1436,14 @@ class World implements ChunkManager{
 
 		$this->provider->getWorldData()->setTime($this->time);
 		$this->saveChunks();
-		$this->provider->getWorldData()->save();
+
+		$worldData = $this->provider->getWorldData();
+		if(!$worldData instanceof BaseNbtWorldData) {
+			throw new \Error("Unknown worldData");
+		}
+
+		$worldData->getCompoundTag()->setTag("gamerules", $this->getGameruleManager()->getData());
+		$worldData->save();
 
 		$timings->stopTiming();
 

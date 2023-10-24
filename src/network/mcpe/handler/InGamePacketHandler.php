@@ -84,6 +84,7 @@ use pocketmine\network\mcpe\protocol\PlayerHotbarPacket;
 use pocketmine\network\mcpe\protocol\PlayerInputPacket;
 use pocketmine\network\mcpe\protocol\PlayerSkinPacket;
 use pocketmine\network\mcpe\protocol\RequestChunkRadiusPacket;
+use pocketmine\network\mcpe\protocol\RequestPermissionsPacket;
 use pocketmine\network\mcpe\protocol\ServerSettingsRequestPacket;
 use pocketmine\network\mcpe\protocol\ServerSettingsResponsePacket;
 use pocketmine\network\mcpe\protocol\SetActorMotionPacket;
@@ -1125,5 +1126,21 @@ class InGamePacketHandler extends PacketHandler{
 
 		$player->chat($packet->getCommand());
 		return true;
+	}
+
+	public function handleRequestPermissions(RequestPermissionsPacket $packet) : bool{
+		$player = $this->player;
+		if(!$player->getServer()->isOp($player->getName())) {
+			return false;
+		}
+
+		$target = $player->getServer()->getWorldManager()->findEntity($packet->getTargetActorUniqueId());
+		if(!$target instanceof Player) {
+			return false;
+		}
+
+		// TODO SOON :)
+
+		return false;
 	}
 }
