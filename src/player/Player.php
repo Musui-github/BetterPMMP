@@ -2762,7 +2762,7 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 	 * @return Chunk|null
 	 */
 	public function getChunk() : ?Chunk{
-		return $this->getWorld()->getChunk($this->getPosition()->getX() >> 4, $this->getPosition()->getZ() >> 4);
+		return $this->getWorld()->getChunk($this->getPosition()->getFloorX() >> 4, $this->getPosition()->getFloorZ() >> 4);
 	}
 
 	/**

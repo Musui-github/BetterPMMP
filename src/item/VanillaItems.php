@@ -324,6 +324,7 @@ use pocketmine\world\World;
  * @method static HorseArmor GOLDEN_HORSE_ARMOR()
  * @method static HorseArmor DIAMOND_HORSE_ARMOR()
  * @method static SpawnEgg HORSE_SPAWN_EGG()
+ * @method static Brush BRUSH()
  */
 final class VanillaItems{
 	use CloningRegistryTrait;
@@ -571,6 +572,8 @@ final class VanillaItems{
 		self::register("iron_horse_armor", new HorseArmor(new IID(Ids::IRON_HORSE_ARMOR), HorseArmor::TYPE_IRON, "Iron horse armor"));
 		self::register("golden_horse_armor", new HorseArmor(new IID(Ids::GOLDEN_HORSE_ARMOR), HorseArmor::TYPE_GOLDEN, "Golden horse armor"));
 		self::register("diamond_horse_armor", new HorseArmor(new IID(Ids::DIAMOND_HORSE_ARMOR), HorseArmor::TYPE_DIAMOND, "Diamond horse armor"));
+
+		self::register("brush", new Brush(new IID(Ids::BRUSH), "Brush"));
 
 		foreach(BoatType::getAll() as $type){
 			//boat type is static, because different types of wood may have different properties

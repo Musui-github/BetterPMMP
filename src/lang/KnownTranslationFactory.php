@@ -603,6 +603,10 @@ final class KnownTranslationFactory{
 		return new Translatable(KnownTranslationKeys::COMMANDS_WHITELIST_USAGE, []);
 	}
 
+	/**
+	 * BETTER PMMP
+	 */
+
 	public static function commands_experience_usage() : Translatable{
 		return new Translatable(KnownTranslationKeys::COMMANDS_EXPERIENCE_USAGE, []);
 	}
@@ -1554,6 +1558,10 @@ final class KnownTranslationFactory{
 	public static function pocketmine_command_whitelist_description() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_WHITELIST_DESCRIPTION, []);
 	}
+
+	/**
+	 * BETTER PMMP
+	 */
 
 	public static function pocketmine_command_experience_description() : Translatable{
 		return new Translatable(KnownTranslationKeys::POCKETMINE_COMMAND_EXPERIENCE_DESCRIPTION, []);

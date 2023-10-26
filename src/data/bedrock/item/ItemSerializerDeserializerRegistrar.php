@@ -389,6 +389,8 @@ final class ItemSerializerDeserializerRegistrar{
 		$this->map1to1Item(Ids::GOLDEN_HORSE_ARMOR, Items::GOLDEN_HORSE_ARMOR());
 		$this->map1to1Item(Ids::DIAMOND_HORSE_ARMOR, Items::DIAMOND_HORSE_ARMOR());
 		$this->map1to1Item(Ids::HORSE_SPAWN_EGG, Items::HORSE_SPAWN_EGG());
+
+		$this->map1to1Item(Ids::BRUSH, Items::BRUSH());
 	}
 
 	/**
