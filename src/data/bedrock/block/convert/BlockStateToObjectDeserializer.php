@@ -201,7 +201,7 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 		] as $id => $color){
 			$this->map($id, fn(Reader $in) => Blocks::GLAZED_TERRACOTTA()
 				->setColor($color)
-				->setFacing($in->readHorizontalFacing())
+				->setFacing($in->readCardinalHorizontalFacing())
 			);
 		}
 
@@ -994,7 +994,7 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 		});
 		$this->map(Ids::CHEST, function(Reader $in) : Block{
 			return Blocks::CHEST()
-				->setFacing($in->readHorizontalFacing());
+				->setFacing($in->readCardinalHorizontalFacing());
 		});
 		$this->map(Ids::CHORUS_FLOWER, function(Reader $in) : Block{
 			return Blocks::CHORUS_FLOWER()
@@ -1095,7 +1095,7 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 		});
 		$this->map(Ids::ENDER_CHEST, function(Reader $in) : Block{
 			return Blocks::ENDER_CHEST()
-				->setFacing($in->readHorizontalFacing());
+				->setFacing($in->readCardinalHorizontalFacing());
 		});
 		$this->map(Ids::EXPOSED_COPPER, fn() => Helper::decodeCopper(Blocks::COPPER(), CopperOxidation::EXPOSED()));
 		$this->map(Ids::EXPOSED_CUT_COPPER, fn() => Helper::decodeCopper(Blocks::CUT_COPPER(), CopperOxidation::EXPOSED()));
@@ -1155,7 +1155,7 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 		$this->map(Ids::IRON_TRAPDOOR, fn(Reader $in) => Helper::decodeTrapdoor(Blocks::IRON_TRAPDOOR(), $in));
 		$this->map(Ids::LADDER, function(Reader $in) : Block{
 			return Blocks::LADDER()
-				->setFacing($in->readHorizontalFacing());
+				->setFacing($in->readCardinalHorizontalFacing());
 		});
 		$this->map(Ids::LANTERN, function(Reader $in) : Block{
 			return Blocks::LANTERN()
@@ -1504,7 +1504,7 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 		});
 		$this->map(Ids::STONECUTTER_BLOCK, function(Reader $in) : Block{
 			return Blocks::STONECUTTER()
-				->setFacing($in->readHorizontalFacing());
+				->setFacing($in->readCardinalHorizontalFacing());
 		});
 		$this->map(Ids::SWEET_BERRY_BUSH, function(Reader $in) : Block{
 			//berry bush only wants 0-3, but it can be bigger in MCPE due to misuse of GROWTH state which goes up to 7
@@ -1530,7 +1530,7 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 		});
 		$this->map(Ids::TRAPPED_CHEST, function(Reader $in) : Block{
 			return Blocks::TRAPPED_CHEST()
-				->setFacing($in->readHorizontalFacing());
+				->setFacing($in->readCardinalHorizontalFacing());
 		});
 		$this->map(Ids::TRIP_WIRE, function(Reader $in) : Block{
 			return Blocks::TRIPWIRE()
@@ -1572,7 +1572,7 @@ final class BlockStateToObjectDeserializer implements BlockStateDeserializer{
 		});
 		$this->map(Ids::WALL_BANNER, function(Reader $in) : Block{
 			return Blocks::WALL_BANNER()
-				->setFacing($in->readHorizontalFacing());
+				->setFacing($in->readCardinalHorizontalFacing());
 		});
 		$this->map(Ids::WATER, fn(Reader $in) => Helper::decodeStillLiquid(Blocks::WATER(), $in));
 		$this->map(Ids::WAXED_COPPER, fn() => Helper::decodeWaxedCopper(Blocks::COPPER(), CopperOxidation::NONE()));
