@@ -33,7 +33,6 @@ use pocketmine\scheduler\BulkCurlTask;
 use pocketmine\scheduler\BulkCurlTaskOperation;
 use pocketmine\timings\TimingsHandler;
 use pocketmine\utils\InternetException;
-use pocketmine\utils\InternetRequestResult;
 use pocketmine\utils\Utils;
 use pocketmine\YmlServerProperties;
 use Symfony\Component\Filesystem\Path;

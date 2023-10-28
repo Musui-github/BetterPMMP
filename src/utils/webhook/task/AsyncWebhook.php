@@ -2,13 +2,9 @@
 
 namespace pocketmine\utils\webhook\task;
 
-use CurlHandle;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\thread\NonThreadSafeValue;
-use pocketmine\utils\webhook\exeption\CurlException;
-use pocketmine\utils\webhook\exeption\InvalidWebhookException;
-use pocketmine\utils\webhook\Webhook;
 
 class AsyncWebhook extends AsyncTask
 {
