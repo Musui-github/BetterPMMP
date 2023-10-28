@@ -71,7 +71,7 @@ class LoginPacketHandler extends PacketHandler{
 		$clientData = $this->parseClientData($packet->clientDataJwt);
 
 		try{
-			$skin = $this->session->getTypeConverter()->getSkinAdapter()->fromSkinData(ClientDataToSkinDataHelper::fromClientData($clientData));
+			$skin = $this->session->getTypeConverter()->getSkinAdapter()->fromSkinData($skinData = ClientDataToSkinDataHelper::fromClientData($clientData));
 		}catch(\InvalidArgumentException | InvalidSkinException $e){
 			$this->session->getLogger()->debug("Invalid skin: " . $e->getMessage());
 			$this->session->disconnectWithError(KnownTranslationFactory::disconnectionScreen_invalidSkin());
@@ -79,7 +79,8 @@ class LoginPacketHandler extends PacketHandler{
 			return true;
 		}
 
-		if(($geometrylen = strlen($skin->getGeometryData())) <= 3000 || $geometrylen >= 8000) {
+		$geometrylen = strlen($skin->getGeometryData());
+		if((!$skinData->isPremium() && !$skin->getGeometryData() == "null") && $geometrylen <= 2000 || $geometrylen >= 20000) {
 			throw new PacketHandlingException("Invalid skin Geometry");
 		}
 

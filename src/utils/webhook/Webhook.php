@@ -11,7 +11,12 @@ class Webhook implements JsonSerializable
 {
 	protected array $data = array();
 	protected string $url = "";
-	protected int $id = WebhookSenderTask::$nextID++;
+	protected int $id;
+
+	public function __construct()
+	{
+		$this->id = WebhookSenderTask::nextId();
+	}
 
 	/**
 	 * @return string|null
@@ -97,8 +102,10 @@ class Webhook implements JsonSerializable
 		return $this->id;
 	}
 
-	public function send()
-	{
+	/**
+	 * @return void
+	 */
+	public function send() : void{
 		WebhookSenderTask::getInstance()->addWebhook($this);
 	}
 

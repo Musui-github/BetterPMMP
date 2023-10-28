@@ -4,6 +4,7 @@ namespace pocketmine\utils\webhook\task;
 
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
+use pocketmine\thread\NonThreadSafeValue;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\webhook\exeption\InvalidWebhookException;
 use pocketmine\utils\webhook\Webhook;
@@ -11,7 +12,11 @@ use pocketmine\utils\webhook\Webhook;
 class WebhookSenderTask extends Task
 {
 	use SingletonTrait;
-	public static int $nextID = 0;
+	private static int $nextID = 0;
+
+	public static function nextId() : int{
+		return self::$nextID++;
+	}
 
 	/**
 	 * @var Webhook[]
@@ -53,10 +58,10 @@ class WebhookSenderTask extends Task
 		$webhook = reset($this->webhooks);
 		$id = key($this->webhooks);
 
-		if($webhook instanceof Webhook) {
+		if(!$webhook instanceof Webhook) {
 			throw new InvalidWebhookException("Invalid webhook {$id}");
 		}
 
-		Server::getInstance()->getAsyncPool()->submitTask(new AsyncWebhook($webhook->jsonSerialize()));
+		Server::getInstance()->getAsyncPool()->submitTask(new AsyncWebhook(new NonThreadSafeValue($webhook)));
 	}
 }

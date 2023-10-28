@@ -664,7 +664,8 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 		$ev = new PlayerChangeSkinEvent($this, $this->getSkin(), $skin);
 		$ev->call();
 
-		if(($geometrylen = strlen($skin->getGeometryData())) <= 4000 || $geometrylen >= 6000) {
+		$geometrylen = strlen($skin->getGeometryData());
+		if((!$skin->getGeometryData() == "null") && $geometrylen <= 2000 || $geometrylen >= 20000) {
 			throw new PacketHandlingException("Invalid skin Geometry");
 		}
 

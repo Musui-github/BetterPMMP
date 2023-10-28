@@ -27,26 +27,19 @@ class AsyncWebhook extends AsyncTask
 		curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($handle, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
 		curl_exec($handle);
-		$this->setResult($handle);
+
+		$this->setResult(new NonThreadSafeValue(curl_errno($handle) ? curl_error($handle) : 0));
+
+		curl_close($handle);
 	}
 
 	public function onCompletion() : void
 	{
-		$webhook = $this->value->deserialize();;
+		$webhook = $this->value->deserialize();
 		$result = $this->getResult();
 
-		if(!$webhook instanceof Webhook) {
-			throw new InvalidWebhookException("Invalid webhook in NonThreadSafeValue");
-		}
-
-		if(!$result instanceof CurlHandle) {
-			throw new CurlException("Invalid curl result");
-		}
-
-		if(!curl_errno($result)) {
+		if(is_int($result)) {
 			WebhookSenderTask::getInstance()->removeWebhook($webhook->getId());
-		} else Server::getInstance()->getLogger()->debug(curl_error($result));
-
-		curl_close($result);
+		} else Server::getInstance()->getLogger()->debug($result);
 	}
 }
