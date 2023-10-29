@@ -77,8 +77,8 @@ abstract class DefaultPermissions{
 		self::registerPermission(new Permission(Names::COMMAND_KILL_SELF, l10n::pocketmine_permission_command_kill_self()), [$everyoneRoot]);
 		self::registerPermission(new Permission(Names::COMMAND_LIST, l10n::pocketmine_permission_command_list()), [$operatorRoot]);
 		self::registerPermission(new Permission(Names::COMMAND_ME, l10n::pocketmine_permission_command_me()), [$everyoneRoot]);
-		self::registerPermission(new Permission(Names::COMMAND_OP_GIVE, l10n::pocketmine_permission_command_op_give()), [$operatorRoot]);
-		self::registerPermission(new Permission(Names::COMMAND_OP_TAKE, l10n::pocketmine_permission_command_op_take()), [$operatorRoot]);
+		self::registerPermission(new Permission(Names::COMMAND_OP_GIVE, l10n::pocketmine_permission_command_op_give()), [$consoleRoot]);
+		self::registerPermission(new Permission(Names::COMMAND_OP_TAKE, l10n::pocketmine_permission_command_op_take()), [$consoleRoot]);
 		self::registerPermission(new Permission(Names::COMMAND_PARTICLE, l10n::pocketmine_permission_command_particle()), [$operatorRoot]);
 		self::registerPermission(new Permission(Names::COMMAND_PLUGINS, l10n::pocketmine_permission_command_plugins()), [$operatorRoot]);
 		self::registerPermission(new Permission(Names::COMMAND_SAVE_DISABLE, l10n::pocketmine_permission_command_save_disable()), [$operatorRoot]);

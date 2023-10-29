@@ -29,6 +29,7 @@ use pocketmine\block\Lectern;
 use pocketmine\block\tile\Sign;
 use pocketmine\block\utils\SignText;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\entity\animation\ArmSwingAnimation;
 use pocketmine\entity\animation\ConsumingItemAnimation;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\effect\VanillaEffects;
@@ -41,6 +42,7 @@ use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\inventory\transaction\TransactionBuilder;
 use pocketmine\inventory\transaction\TransactionCancelledException;
 use pocketmine\inventory\transaction\TransactionValidationException;
+use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
 use pocketmine\item\WritableBook;
 use pocketmine\item\WritableBookPage;
@@ -49,6 +51,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\StringTag;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\InventoryManager;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
@@ -83,6 +86,7 @@ use pocketmine\network\mcpe\protocol\PlayerAuthInputPacket;
 use pocketmine\network\mcpe\protocol\PlayerHotbarPacket;
 use pocketmine\network\mcpe\protocol\PlayerInputPacket;
 use pocketmine\network\mcpe\protocol\PlayerSkinPacket;
+use pocketmine\network\mcpe\protocol\RequestAbilityPacket;
 use pocketmine\network\mcpe\protocol\RequestChunkRadiusPacket;
 use pocketmine\network\mcpe\protocol\RequestPermissionsPacket;
 use pocketmine\network\mcpe\protocol\ServerSettingsRequestPacket;
@@ -198,27 +202,6 @@ class InGamePacketHandler extends PacketHandler{
 	}
 
 	public function handlePlayerAuthInput(PlayerAuthInputPacket $packet) : bool{
-		$player = $this->player;
-		if(
-			!$player->isGliding() &&
-			!$player->getAllowFlight() &&
-			$player->getInAirTicks() > 10 &&
-			!$player->onGround &&
-			!$player->isSleeping() &&
-			!$player->isSwimming() &&
-			!$player->getEffects()->has(VanillaEffects::LEVITATION()) &&
-			$player->lastDamageTicks > 10)
-		{
-			$ignore = ($block = $player->getWorld()->getBlock($packet->getPosition())) === VanillaBlocks::LADDER() || $block === VanillaBlocks::VINES() || $block === VanillaBlocks::COBWEB();
-			$expectedVelocity = (-$player->getGravity()) / (0.02) - ((-$player->getGravity()) / (0.02)) * exp(-(0.02) * (($player->getInAirTicks())));
-			$ydiff = $player->getPosition()->getY() - $packet->getPosition()->subtract(0, 1.62, 0)->getY();
-			if(!$player->getEffects()->has(VanillaEffects::JUMP_BOOST()) && (($movementSpeed = $player->getMovementSpeed()) - $expectedVelocity) ** 2 > 0.6 && $expectedVelocity < $movementSpeed && !$ignore && $ydiff < 0.5) {
-				if(!$player->kick("Flying is not enabled on this server")){
-					$player->setMotion(new Vector3(0, $expectedVelocity, 0));
-				}
-			}
-		}
-
 		$rawPos = $packet->getPosition();
 		$rawYaw = $packet->getYaw();
 		$rawPitch = $packet->getPitch();
@@ -267,6 +250,7 @@ class InGamePacketHandler extends PacketHandler{
 			$swimming = $this->resolveOnOffInputFlags($inputFlags, PlayerAuthInputFlags::START_SWIMMING, PlayerAuthInputFlags::STOP_SWIMMING);
 			$gliding = $this->resolveOnOffInputFlags($inputFlags, PlayerAuthInputFlags::START_GLIDING, PlayerAuthInputFlags::STOP_GLIDING);
 			$flying = $this->resolveOnOffInputFlags($inputFlags, PlayerAuthInputFlags::START_FLYING, PlayerAuthInputFlags::STOP_FLYING);
+
 			$mismatch =
 				($sneaking !== null && !$this->player->toggleSneak($sneaking)) |
 				($sprinting !== null && !$this->player->toggleSprint($sprinting)) |
@@ -664,6 +648,17 @@ class InGamePacketHandler extends PacketHandler{
 	}
 
 	public function handleMobEquipment(MobEquipmentPacket $packet) : bool{
+		$item = TypeConverter::getInstance()->netItemStackToCore($packet->item->getItemStack());
+		$itemInHand = $this->player->getInventory()->getItem($packet->hotbarSlot);
+		if(
+			count($item->getEnchantments()) !== count($itemInHand->getEnchantments()) ||
+			count($item->getLore()) !== count($itemInHand->getLore()) ||
+			count($item->getCanDestroy()) !== count($itemInHand->getCanDestroy()) ||
+			count($item->getCanPlaceOn()) !== count($itemInHand->getCanPlaceOn())
+		) {
+			throw new PacketHandlingException("Invalid item nbt");
+		}
+
 		if($packet->windowId === ContainerIds::OFFHAND){
 			return true; //this happens when we put an item into the offhand
 		}
@@ -678,6 +673,19 @@ class InGamePacketHandler extends PacketHandler{
 	}
 
 	public function handleMobArmorEquipment(MobArmorEquipmentPacket $packet) : bool{
+		foreach([$packet->head, $packet->chest, $packet->legs, $packet->feet] as $i => $item) {
+			$item = TypeConverter::getInstance()->netItemStackToCore($item->getItemStack());
+			$realItem = $this->player->getInventory()->getItem($i);
+			if(
+				count($item->getEnchantments()) !== count($realItem->getEnchantments()) ||
+				count($item->getLore()) !== count($realItem->getLore()) ||
+				count($item->getCanDestroy()) !== count($realItem->getCanDestroy()) ||
+				count($item->getCanPlaceOn()) !== count($realItem->getCanPlaceOn())
+			) {
+				throw new PacketHandlingException("Invalid item nbt");
+			}
+		}
+
 		return true; //Not used
 	}
 
@@ -763,6 +771,9 @@ class InGamePacketHandler extends PacketHandler{
 	}
 
 	public function handleAnimate(AnimatePacket $packet) : bool{
+		if($packet->action === AnimatePacket::ACTION_SWING_ARM) {
+			$this->player->broadcastAnimation(new ArmSwingAnimation($this->player));
+		}
 		return true; //Not used
 	}
 

@@ -35,6 +35,12 @@ class CustomForm extends Form {
 				if(!$validationMethod($v)) {
 					throw new PacketHandlingException("Invalid type given for element " . $this->labelMap[$i]);
 				}
+
+				$presentData = $this->data["content"][$i];
+				if($presentData["type"] === "slider" && $v < $presentData["min"] || $v > $presentData["max"]) {
+					throw new PacketHandlingException("Invalid slider value " . $this->labelMap[$i]);
+				}
+
 				$new[$this->labelMap[$i]] = $v;
 			}
 			$data = $new;

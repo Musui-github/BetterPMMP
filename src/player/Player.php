@@ -1557,7 +1557,9 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 
 				if(str_starts_with($messagePart, "/")){
 					Timings::$playerCommand->startTiming();
-					$this->server->dispatchCommand($this, substr($messagePart, 1));
+					$command = explode(" ", $messagePart);
+					$command[0] = strtolower($command[0]);
+					$this->server->dispatchCommand($this, substr(implode(" ", $command), 1));
 					Timings::$playerCommand->stopTiming();
 				}else{
 					$ev = new PlayerChatEvent($this, $messagePart, $this->server->getBroadcastChannelSubscribers(Server::BROADCAST_CHANNEL_USERS), new StandardChatFormatter());
@@ -2024,7 +2026,10 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 			return true;
 		}
 		$ev = new PlayerToggleFlightEvent($this, $fly);
-		if(!$this->allowFlight){
+		if(!$this->allowFlight && $fly){
+			if(!$this->kick("Flying is not enabled on this server")) {
+				$this->setMotion(new Vector3(0, (-$this->getGravity()) / (0.02) - ((-$this->getGravity()) / (0.02)) * exp(-(0.02) * (($this->getInAirTicks()))), 0));
+			}
 			$ev->cancel();
 		}
 		$ev->call();

@@ -92,8 +92,7 @@ class PreSpawnPacketHandler extends PacketHandler{
 				"scripting" => true,
 				"upcoming_creator_features" => true,
 				"gametest" => true,
-				"experimental_molang_features" => true,
-				"short_sneaking" => false
+				"experimental_molang_features" => true
 			], true);
 
 			$this->session->sendDataPacket(StartGamePacket::create(
