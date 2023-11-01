@@ -27,6 +27,7 @@ use pocketmine\entity\InvalidSkinException;
 use pocketmine\entity\Skin;
 use pocketmine\network\mcpe\protocol\types\skin\SkinData;
 use pocketmine\network\mcpe\protocol\types\skin\SkinImage;
+use function spl_object_id;
 use function is_array;
 use function is_string;
 use function json_decode;
@@ -36,8 +37,23 @@ use function str_repeat;
 use const JSON_THROW_ON_ERROR;
 
 class LegacySkinAdapter implements SkinAdapter{
+	private array $personaSkinData = [];
 
 	public function toSkinData(Skin $skin) : SkinData{
+		return $this->personaSkinData[spl_object_id($skin)] ?? $this->toDefaultSkinData($skin);
+	}
+
+	public function fromSkinData(SkinData $data) : Skin{
+		$skin = $this->fromDefaultSkinData($data);
+
+		if($data->isPersona()){
+			$this->personaSkinData[spl_object_id($skin)] = $data;
+		}
+
+		return $skin;
+	}
+
+	public function toDefaultSkinData(Skin $skin) : SkinData{
 		$capeData = $skin->getCapeData();
 		$capeImage = $capeData === "" ? new SkinImage(0, 0, "") : new SkinImage(32, 64, $capeData);
 		$geometryName = $skin->getGeometryName();
@@ -54,7 +70,7 @@ class LegacySkinAdapter implements SkinAdapter{
 		);
 	}
 
-	public function fromSkinData(SkinData $data) : Skin{
+	public function fromDefaultSkinData(SkinData $data) : Skin{
 		if($data->isPersona()){
 			return new Skin("Standard_Custom", str_repeat(random_bytes(3) . "\xff", 4096));
 		}
