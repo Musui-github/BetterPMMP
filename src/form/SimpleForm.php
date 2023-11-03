@@ -27,6 +27,9 @@ class SimpleForm extends Form {
 
     public function processData(&$data) : void {
         if($data !== null) {
+			if ($data === "null") {
+				throw new FormValidationException("Crash avoided, \"null\" was sent as data.");
+			}
             if(!is_int($data)) {
                 throw new FormValidationException("Expected an integer response, got " . gettype($data));
             }
