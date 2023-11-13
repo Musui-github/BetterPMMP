@@ -108,33 +108,22 @@ class TypeConverter{
 	 * @internal
 	 */
 	public function coreGameModeToProtocol(GameMode $gamemode) : int{
-		switch($gamemode->id()){
-			case GameMode::SURVIVAL()->id():
-				return ProtocolGameMode::SURVIVAL;
-			case GameMode::CREATIVE()->id():
-			case GameMode::SPECTATOR()->id():
-				return ProtocolGameMode::CREATIVE;
-			case GameMode::ADVENTURE()->id():
-				return ProtocolGameMode::ADVENTURE;
-			default:
-				throw new AssumptionFailedError("Unknown game mode");
-		}
+		return match ($gamemode->id()) {
+			GameMode::SURVIVAL()->id() => ProtocolGameMode::SURVIVAL,
+			GameMode::CREATIVE()->id(), GameMode::SPECTATOR()->id() => ProtocolGameMode::CREATIVE,
+			GameMode::ADVENTURE()->id() => ProtocolGameMode::ADVENTURE,
+			default => throw new AssumptionFailedError("Unknown game mode"),
+		};
 	}
 
 	public function protocolGameModeToCore(int $gameMode) : ?GameMode{
-		switch($gameMode){
-			case ProtocolGameMode::SURVIVAL:
-				return GameMode::SURVIVAL();
-			case ProtocolGameMode::CREATIVE:
-				return GameMode::CREATIVE();
-			case ProtocolGameMode::ADVENTURE:
-				return GameMode::ADVENTURE();
-			case ProtocolGameMode::CREATIVE_VIEWER:
-			case ProtocolGameMode::SURVIVAL_VIEWER:
-				return GameMode::SPECTATOR();
-			default:
-				return null;
-		}
+		return match ($gameMode) {
+			ProtocolGameMode::SURVIVAL => GameMode::SURVIVAL(),
+			ProtocolGameMode::CREATIVE => GameMode::CREATIVE(),
+			ProtocolGameMode::ADVENTURE => GameMode::ADVENTURE(),
+			ProtocolGameMode::CREATIVE_VIEWER, ProtocolGameMode::SURVIVAL_VIEWER => GameMode::SPECTATOR(),
+			default => null,
+		};
 	}
 
 	public function coreRecipeIngredientToNet(?RecipeIngredient $ingredient) : ProtocolRecipeIngredient{

@@ -279,7 +279,7 @@ class InGamePacketHandler extends PacketHandler{
 
 		$blockActions = $packet->getBlockActions();
 		if($blockActions !== null){
-			if(count($blockActions) > 100){
+			if(count($blockActions) > 35){
 				throw new PacketHandlingException("Too many block actions in PlayerAuthInputPacket");
 			}
 			foreach($blockActions as $k => $blockAction){
